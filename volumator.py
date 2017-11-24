@@ -21,12 +21,14 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
+from PyQt4.QtGui import QAction, QIcon, QFileDialog
 # Initialize Qt resources from file resources.py
 import resources
 # Import the code for the dialog
 from volumator_dialog import volumDialog
 import os.path
+
+print "teste"
 
 
 class volum:
@@ -58,6 +60,9 @@ class volum:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
+        # Create the dialog (after translation) and keep reference
+        self.dlg = volumDialog()
+
 
         # Declare instance attributes
         self.actions = []
@@ -65,6 +70,10 @@ class volum:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'volum')
         self.toolbar.setObjectName(u'volum')
+
+
+        self.dlg.input2.clear()
+        self.dlg.botaoinput.clicked.connect(self.select_input_file)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -179,6 +188,15 @@ class volum:
         # remove the toolbar
         del self.toolbar
 
+    ################################################################ FUNÇOES
+
+    def select_input_file(self):
+        filename = QFileDialog.getSaveFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
+        self.dlg.input2.setText(filename)
+
+
+
+    #################################################################
 
     def run(self):
         """Run method that performs all the real work"""
@@ -190,4 +208,20 @@ class volum:
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+
+
+            ##################################################################################### CODIGO
+
+            print filename
+
+            # botaoinput.clicked.connect
+
+            filename = self.dlg.input2.text()
+            input_file = open(filename, 'w')
+
+            print filename
+
+
+            #####################################################################################
+            # pass
+            
