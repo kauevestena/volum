@@ -60,7 +60,7 @@ class volum:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
+        ## Create the dialog (after translation) and keep reference
         self.dlg = volumDialog()
 
 
@@ -70,10 +70,17 @@ class volum:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'volum')
         self.toolbar.setObjectName(u'volum')
+       
+       #####################################################################
 
+
+        # self.dlg.lineEdit.clear()
+        # self.dlg.pushButton.clicked.connect(self.select_output_file)
 
         self.dlg.input2.clear()
         self.dlg.botaoinput.clicked.connect(self.select_input_file)
+
+        ##################################################################
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -142,7 +149,7 @@ class volum:
         """
 
         # Create the dialog (after translation) and keep reference
-        self.dlg = volumDialog()
+        #self.dlg = volumDialog()
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -194,6 +201,10 @@ class volum:
         filename = QFileDialog.getSaveFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
         self.dlg.input2.setText(filename)
 
+    # def select_output_file(self):
+    #     filename = QFileDialog.getSaveFileName(volumDialog(), "Select output file ","", '*.txt')
+    #     self.dlg.lineEdit.setText(filename)
+
 
 
     #################################################################
@@ -218,8 +229,6 @@ class volum:
 
             filename = self.dlg.input2.text()
             input_file = open(filename, 'w')
-
-            print filename
 
 
             #####################################################################################
