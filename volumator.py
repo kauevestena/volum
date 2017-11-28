@@ -3,7 +3,8 @@
 /***************************************************************************
  volum
                                  A QGIS plugin
- Plugin Para Calculo de volumes voltado para conjuntos esparsos de dados (malha de pontos XYZ)
+ Plugin Para Calculo de volumes voltado para
+  conjuntos esparsos de dados (malha de pontos XYZ)
                               -------------------
         begin                : 2017-11-23
         git sha              : $Format:%H$
@@ -149,7 +150,7 @@ class volum:
         """
 
         # Create the dialog (after translation) and keep reference
-        #self.dlg = volumDialog()
+        #self.dlg = volumDialog() ### isso causava o bug da janela de dialogo nao abrir...
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -198,7 +199,7 @@ class volum:
     ################################################################ FUNÇOES
 
     def select_input_file(self):
-        filename = QFileDialog.getSaveFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
+        filename = QFileDialog.getOpenFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
         self.dlg.input2.setText(filename)
 
     # def select_output_file(self):
@@ -215,7 +216,11 @@ class volum:
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
+        
         # See if OK was pressed
+
+
+
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
@@ -223,14 +228,19 @@ class volum:
 
             ##################################################################################### CODIGO
 
-            print filename
+            
 
             # botaoinput.clicked.connect
 
-            filename = self.dlg.input2.text()
-            input_file = open(filename, 'w')
+            # # filename = self.dlg.input2.text()
+            
+            # # print filename
+            
+            # # # input_file = open(filename, 'w')
+
+            # # processing.runalg("qgis:delaunaytriangulation",filename+"?type=csv&xField=X&yField=Y&spatialIndex=yes&subsetIndex=no&watchFile=yes","memory:")
 
 
             #####################################################################################
-            # pass
+            pass
             

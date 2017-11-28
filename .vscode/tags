@@ -1,0 +1,138 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CANVAS	../test/utilities.py	/^CANVAS = None$/;"	kind:variable	line:10
+ENDPOINT	../plugin_upload.py	/^ENDPOINT = '\/plugins\/RPC2\/'$/;"	kind:variable	line:17
+IFACE	../test/utilities.py	/^IFACE = None$/;"	kind:variable	line:12
+LOGGER	../test/qgis_interface.py	/^LOGGER = logging.getLogger('QGIS')$/;"	kind:variable	line:30
+LOGGER	../test/test_init.py	/^LOGGER = logging.getLogger('QGIS')$/;"	kind:variable	line:16
+LOGGER	../test/utilities.py	/^LOGGER = logging.getLogger('QGIS')$/;"	kind:variable	line:8
+PARENT	../test/utilities.py	/^PARENT = None$/;"	kind:variable	line:11
+PORT	../plugin_upload.py	/^PORT = '80'$/;"	kind:variable	line:16
+PROTOCOL	../plugin_upload.py	/^PROTOCOL = 'http'$/;"	kind:variable	line:14
+QGISTest	../test/test_qgis_environment.py	/^class QGISTest(unittest.TestCase):$/;"	kind:class	line:27
+QGIS_APP	../test/test_qgis_environment.py	/^QGIS_APP = get_qgis_app()$/;"	kind:variable	line:24
+QGIS_APP	../test/test_translations.py	/^QGIS_APP = get_qgis_app()$/;"	kind:variable	line:21
+QGIS_APP	../test/test_volumator_dialog.py	/^QGIS_APP = get_qgis_app()$/;"	kind:variable	line:22
+QGIS_APP	../test/utilities.py	/^QGIS_APP = None  # Static variable used to hold hand to running QGIS app$/;"	kind:variable	line:9
+QgisInterface	../test/qgis_interface.py	/^class QgisInterface(QObject):$/;"	kind:class	line:34
+SERVER	../plugin_upload.py	/^SERVER = 'plugins.qgis.org'$/;"	kind:variable	line:15
+SafeTranslationsTest	../test/test_translations.py	/^class SafeTranslationsTest(unittest.TestCase):$/;"	kind:class	line:24
+TestInit	../test/test_init.py	/^class TestInit(unittest.TestCase):$/;"	kind:class	line:19
+VERBOSE	../plugin_upload.py	/^VERBOSE = False$/;"	kind:variable	line:18
+__author__	../test/qgis_interface.py	/^__author__ = 'tim@linfiniti.com'$/;"	kind:variable	line:17
+__author__	../test/test_init.py	/^__author__ = 'Tim Sutton <tim@linfiniti.com>'$/;"	kind:variable	line:4
+__author__	../test/test_qgis_environment.py	/^__author__ = 'tim@linfiniti.com'$/;"	kind:variable	line:11
+__author__	../test/test_resources.py	/^__author__ = 'kauemv2@gmail.com'$/;"	kind:variable	line:11
+__author__	../test/test_translations.py	/^__author__ = 'ismailsunni@yahoo.co.id'$/;"	kind:variable	line:12
+__author__	../test/test_volumator_dialog.py	/^__author__ = 'kauemv2@gmail.com'$/;"	kind:variable	line:11
+__copyright__	../test/qgis_interface.py	/^__copyright__ = ($/;"	kind:variable	line:20
+__copyright__	../test/test_init.py	/^__copyright__ = 'Copyright 2012, Australia Indonesia Facility for '$/;"	kind:variable	line:8
+__copyright__	../test/test_qgis_environment.py	/^__copyright__ = ('Copyright 2012, Australia Indonesia Facility for '$/;"	kind:variable	line:13
+__copyright__	../test/test_resources.py	/^__copyright__ = 'Copyright 2017, Kaue de Moraes Vestena - UFPR'$/;"	kind:variable	line:13
+__copyright__	../test/test_translations.py	/^__copyright__ = ('Copyright 2012, Australia Indonesia Facility for '$/;"	kind:variable	line:14
+__copyright__	../test/test_volumator_dialog.py	/^__copyright__ = 'Copyright 2017, Kaue de Moraes Vestena - UFPR'$/;"	kind:variable	line:13
+__date__	../test/qgis_interface.py	/^__date__ = '10\/01\/2011'$/;"	kind:variable	line:19
+__date__	../test/test_init.py	/^__date__ = '17\/10\/2010'$/;"	kind:variable	line:6
+__date__	../test/test_qgis_environment.py	/^__date__ = '20\/01\/2011'$/;"	kind:variable	line:12
+__date__	../test/test_resources.py	/^__date__ = '2017-11-23'$/;"	kind:variable	line:12
+__date__	../test/test_translations.py	/^__date__ = '12\/10\/2011'$/;"	kind:variable	line:13
+__date__	../test/test_volumator_dialog.py	/^__date__ = '2017-11-23'$/;"	kind:variable	line:12
+__init__	../test/qgis_interface.py	/^    def __init__(self, canvas):$/;"	kind:member	line:42
+__init__	../volumator.py	/^    def __init__(self, iface):$/;"	kind:member	line:38
+__init__	../volumator_dialog.py	/^    def __init__(self, parent=None):$/;"	kind:member	line:33
+__init__.py	../__init__.py	1;"	kind:file	line:1
+__init__.py	../test/__init__.py	1;"	kind:file	line:1
+__license__	../test/test_init.py	/^__license__ = "GPL"$/;"	kind:variable	line:7
+__revision__	../test/qgis_interface.py	/^__revision__ = '$Format:%H$'$/;"	kind:variable	line:18
+__revision__	../test/test_init.py	/^__revision__ = '$Format:%H$'$/;"	kind:variable	line:5
+activeLayer	../test/qgis_interface.py	/^    def activeLayer(self):$/;"	kind:member	line:150
+addDockWidget	../test/qgis_interface.py	/^    def addDockWidget(self, area, dock_widget):$/;"	kind:member	line:192
+addLayer	../test/qgis_interface.py	/^    def addLayer(self, layer):$/;"	kind:member	line:84
+addLayers	../test/qgis_interface.py	/^    def addLayers(self, layers):$/;"	kind:member	line:62
+addRasterLayer	../test/qgis_interface.py	/^    def addRasterLayer(self, path, base_name):$/;"	kind:member	line:139
+addToolBar	../test/qgis_interface.py	/^    def addToolBar(self, name):$/;"	kind:member	line:173
+addToolBarIcon	../test/qgis_interface.py	/^    def addToolBarIcon(self, action):$/;"	kind:member	line:157
+addVectorLayer	../test/qgis_interface.py	/^    def addVectorLayer(self, path, base_name, provider_key):$/;"	kind:member	line:125
+add_action	../volumator.py	/^    def add_action($/;"	kind:member	line:102
+classFactory	../__init__.py	/^def classFactory(iface):  # pylint: disable=invalid-name$/;"	kind:function	line:27
+conf.py	../help/source/conf.py	1;"	kind:file	line:1
+copyright	../help/source/conf.py	/^copyright = u'2013, Kaue de Moraes Vestena - UFPR'$/;"	kind:variable	line:44
+currentLayerChanged	../test/qgis_interface.py	/^    currentLayerChanged = pyqtSignal(QgsMapCanvasLayer)$/;"	kind:variable	line:40
+exclude_patterns	../help/source/conf.py	/^exclude_patterns = []$/;"	kind:variable	line:67
+extensions	../help/source/conf.py	/^extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath', 'sphinx.ext.viewcode']$/;"	kind:variable	line:28
+get_qgis_app	../test/utilities.py	/^def get_qgis_app():$/;"	kind:function	line:15
+hide_password	../plugin_upload.py	/^def hide_password(url, start=6):$/;"	kind:function	line:55
+html_static_path	../help/source/conf.py	/^html_static_path = ['_static']$/;"	kind:variable	line:123
+html_theme	../help/source/conf.py	/^html_theme = 'default'$/;"	kind:variable	line:94
+htmlhelp_basename	../help/source/conf.py	/^htmlhelp_basename = 'TemplateClassdoc'$/;"	kind:variable	line:167
+initGui	../volumator.py	/^    def initGui(self):$/;"	kind:member	line:178
+latex_documents	../help/source/conf.py	/^latex_documents = [$/;"	kind:variable	line:180
+legendInterface	../test/qgis_interface.py	/^    def legendInterface(self):$/;"	kind:member	line:203
+main	../plugin_upload.py	/^def main(parameters, arguments):$/;"	kind:function	line:21
+mainWindow	../test/qgis_interface.py	/^    def mainWindow(self):$/;"	kind:member	line:185
+man_pages	../help/source/conf.py	/^man_pages = [$/;"	kind:variable	line:213
+mapCanvas	../test/qgis_interface.py	/^    def mapCanvas(self):$/;"	kind:member	line:181
+master_doc	../help/source/conf.py	/^master_doc = 'index'$/;"	kind:variable	line:40
+newProject	../test/qgis_interface.py	/^    def newProject(self):$/;"	kind:member	line:102
+parser	../plugin_upload.py	/^    parser = OptionParser(usage="%prog [options] plugin.zip")$/;"	kind:variable	line:73
+plugin_upload.py	../plugin_upload.py	1;"	kind:file	line:1
+project	../help/source/conf.py	/^project = u'volum'$/;"	kind:variable	line:43
+pygments_style	../help/source/conf.py	/^pygments_style = 'sphinx'$/;"	kind:variable	line:84
+qCleanupResources	../resources.py	/^def qCleanupResources():$/;"	kind:function	line:106
+qInitResources	../resources.py	/^def qInitResources():$/;"	kind:function	line:103
+qgis_interface.py	../test/qgis_interface.py	1;"	kind:file	line:1
+qt_resource_data	../resources.py	/^"$/;"	kind:variable	line:79
+qt_resource_name	../resources.py	/^"$/;"	kind:variable	line:94
+qt_resource_struct	../resources.py	/^"$/;"	kind:variable	line:101
+release	../help/source/conf.py	/^release = '0.1'$/;"	kind:variable	line:53
+removeAllLayers	../test/qgis_interface.py	/^    def removeAllLayers(self):$/;"	kind:member	line:98
+removeToolBarIcon	../test/qgis_interface.py	/^    def removeToolBarIcon(self, action):$/;"	kind:member	line:165
+res	../plugin_upload.py	/^        res = raw_input()$/;"	kind:variable	line:99
+resources.py	../resources.py	1;"	kind:file	line:1
+run	../volumator.py	/^    def run(self):$/;"	kind:member	line:213
+runner	../test/test_resources.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:40
+runner	../test/test_translations.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:54
+runner	../test/test_volumator_dialog.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:53
+select_input_file	../volumator.py	/^    def select_input_file(self):$/;"	kind:member	line:201
+setUp	../test/test_resources.py	/^    def setUp(self):$/;"	kind:member	line:24
+setUp	../test/test_translations.py	/^    def setUp(self):$/;"	kind:member	line:27
+setUp	../test/test_volumator_dialog.py	/^    def setUp(self):$/;"	kind:member	line:28
+source_suffix	../help/source/conf.py	/^source_suffix = '.rst'$/;"	kind:variable	line:34
+suite	../test/test_resources.py	/^    suite = unittest.makeSuite(volumResourcesTest)$/;"	kind:variable	line:39
+suite	../test/test_translations.py	/^    suite = unittest.makeSuite(SafeTranslationsTest)$/;"	kind:variable	line:53
+suite	../test/test_volumator_dialog.py	/^    suite = unittest.makeSuite(volumDialogTest)$/;"	kind:variable	line:52
+tearDown	../test/test_resources.py	/^    def tearDown(self):$/;"	kind:member	line:28
+tearDown	../test/test_translations.py	/^    def tearDown(self):$/;"	kind:member	line:32
+tearDown	../test/test_volumator_dialog.py	/^    def tearDown(self):$/;"	kind:member	line:32
+templates_path	../help/source/conf.py	/^templates_path = ['_templates']$/;"	kind:variable	line:31
+test_dialog_cancel	../test/test_volumator_dialog.py	/^    def test_dialog_cancel(self):$/;"	kind:member	line:44
+test_dialog_ok	../test/test_volumator_dialog.py	/^    def test_dialog_ok(self):$/;"	kind:member	line:36
+test_icon_png	../test/test_resources.py	/^    def test_icon_png(self):$/;"	kind:member	line:32
+test_init.py	../test/test_init.py	1;"	kind:file	line:1
+test_projection	../test/test_qgis_environment.py	/^    def test_projection(self):$/;"	kind:member	line:38
+test_qgis_environment	../test/test_qgis_environment.py	/^    def test_qgis_environment(self):$/;"	kind:member	line:30
+test_qgis_environment.py	../test/test_qgis_environment.py	1;"	kind:file	line:1
+test_qgis_translations	../test/test_translations.py	/^    def test_qgis_translations(self):$/;"	kind:member	line:37
+test_read_init	../test/test_init.py	/^    def test_read_init(self):$/;"	kind:member	line:30
+test_resources.py	../test/test_resources.py	1;"	kind:file	line:1
+test_translations.py	../test/test_translations.py	1;"	kind:file	line:1
+test_volumator_dialog.py	../test/test_volumator_dialog.py	1;"	kind:file	line:1
+tr	../volumator.py	/^    def tr(self, message):$/;"	kind:member	line:87
+unload	../volumator.py	/^    def unload(self):$/;"	kind:member	line:189
+username	../plugin_upload.py	/^        username = getpass.getuser()$/;"	kind:variable	line:97
+utilities.py	../test/utilities.py	1;"	kind:file	line:1
+version	../help/source/conf.py	/^version = '0.1'$/;"	kind:variable	line:51
+volum	../volumator.py	/^class volum:$/;"	kind:class	line:35
+volumDialog	../volumator_dialog.py	/^class volumDialog(QtGui.QDialog, FORM_CLASS):$/;"	kind:class	line:32
+volumDialogTest	../test/test_resources.py	/^class volumDialogTest(unittest.TestCase):$/;"	kind:class	line:21
+volumDialogTest	../test/test_volumator_dialog.py	/^class volumDialogTest(unittest.TestCase):$/;"	kind:class	line:25
+volumator.py	../volumator.py	1;"	kind:file	line:1
+volumator_dialog.py	../volumator_dialog.py	1;"	kind:file	line:1
+zoomFull	../test/qgis_interface.py	/^    def zoomFull(self):$/;"	kind:member	line:109
+zoomToActiveLayer	../test/qgis_interface.py	/^    def zoomToActiveLayer(self):$/;"	kind:member	line:121
+zoomToNext	../test/qgis_interface.py	/^    def zoomToNext(self):$/;"	kind:member	line:117
+zoomToPrevious	../test/qgis_interface.py	/^    def zoomToPrevious(self):$/;"	kind:member	line:113
