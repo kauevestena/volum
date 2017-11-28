@@ -23,8 +23,15 @@
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
+from qgis.gui import QgsMapCanvas
 # Initialize Qt resources from file resources.py
 import resources
+
+############
+import processing
+############
+
 # Import the code for the dialog
 from volumator_dialog import volumDialog
 import os.path
@@ -206,7 +213,12 @@ class volum:
     #     filename = QFileDialog.getSaveFileName(volumDialog(), "Select output file ","", '*.txt')
     #     self.dlg.lineEdit.setText(filename)
 
-
+    def add_layer_canvas(self,layer):
+        # canvas = QgsMapCanvas()
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
+        QgsMapCanvas().setExtent(layer.extent())
+        # canvas.setLayerSet([QgsMapCanvasLayer(layer)])
+        
 
     #################################################################
 
@@ -216,7 +228,7 @@ class volum:
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
-        
+
         # See if OK was pressed
 
 
@@ -230,15 +242,27 @@ class volum:
 
             
 
-            # botaoinput.clicked.connect
+            self.dlg.botaoinput.clicked.connect
 
-            # # filename = self.dlg.input2.text()
+            filename = self.dlg.input2.text()
             
-            # # print filename
+            print filename
             
-            # # # input_file = open(filename, 'w')
+            # path = "file://"+filename+"?type=csv&xField=X&yField=Y&spatialIndex=yes&subsetIndex=no&watchFile=yes"
 
-            # # processing.runalg("qgis:delaunaytriangulation",filename+"?type=csv&xField=X&yField=Y&spatialIndex=yes&subsetIndex=no&watchFile=yes","memory:")
+            path2 = filename+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
+
+            datapoints = QgsVectorLayer(path2, "pontos", "delimitedtext")
+            crs = datapoints.crs()
+            crs.createFromId(31982)
+            datapoints.setCrs(crs)
+
+            # print datapoints.crs
+
+            self.add_layer_canvas(datapoints)
+
+
+            processing.runalg("qgis:delaunaytriangulation",datapoints,"memory:")
 
 
             #####################################################################################

@@ -1,0 +1,4 @@
+            # canvas = QgsMapCanvas()
+            
+            # QgsMapLayerRegistry.instance().addMapLayer(datapoints)
+            # canvas.setExtent(datapoints.extent())
