@@ -2,3 +2,31 @@
             
             # QgsMapLayerRegistry.instance().addMapLayer(datapoints)
             # canvas.setExtent(datapoints.extent())
+
+
+                        # path = "file://"+filename+"?type=csv&xField=X&yField=Y&spatialIndex=yes&subsetIndex=no&watchFile=yes"
+
+
+            # crsOrt = QgsCoordinateReferenceSystem()
+            # crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
+
+            # crs = QgsCoordinateReferenceSystem()
+            # crs.createFromId(31982)
+            # datapoints.setCrs(crs)
+
+            # if self.dlg.defProjButton.clicked:
+            #     datapoints.setCrs(crs2)
+
+
+
+
+
+            # # # # export layer to shape
+            # # # _writer = QgsVectorFileWriter.writeAsVectorFormat(datapoints,point2spath,"utf-8",None,"ESRI Shapefile")
+            # # # datapoints = _writer
+
+            # print datapoints.crs
+
+    # def select_output_file(self):
+    #     filename = QFileDialog.getSaveFileName(volumDialog(), "Select output file ","", '*.txt')
+    #     self.dlg.lineEdit.setText(filename)

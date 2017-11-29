@@ -23,8 +23,9 @@
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
-from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
-from qgis.gui import QgsMapCanvas
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsCoordinateReferenceSystem
+from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
+from qgis.utils import iface
 # Initialize Qt resources from file resources.py
 import resources
 
@@ -85,8 +86,27 @@ class volum:
         # self.dlg.lineEdit.clear()
         # self.dlg.pushButton.clicked.connect(self.select_output_file)
 
+        ##botao input
         self.dlg.input2.clear()
         self.dlg.botaoinput.clicked.connect(self.select_input_file)
+
+        ###botao de seleciona CRS #31982
+        temp = QgsCoordinateReferenceSystem()
+        temp.createFromId(31982)
+        self.dlg.crsSel.setCrs(temp)
+
+
+        #muda seletor de CRS caso seja selecionado o orto
+        self.dlg.defProjButton.clicked.connect(self.set_orto_crs)   
+
+
+        
+
+
+        ## definição do "sobre"
+        self.dlg.aboutDefProj.setOpenExternalLinks(True)
+
+        self.dlg.aboutDefProj.setText('''<a href='http://stackoverflow.com'>sobre</a>''')
 
         ##################################################################
 
@@ -209,9 +229,6 @@ class volum:
         filename = QFileDialog.getOpenFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
         self.dlg.input2.setText(filename)
 
-    # def select_output_file(self):
-    #     filename = QFileDialog.getSaveFileName(volumDialog(), "Select output file ","", '*.txt')
-    #     self.dlg.lineEdit.setText(filename)
 
     def add_layer_canvas(self,layer):
         # canvas = QgsMapCanvas()
@@ -219,8 +236,14 @@ class volum:
         QgsMapCanvas().setExtent(layer.extent())
         # canvas.setLayerSet([QgsMapCanvasLayer(layer)])
         
+    def set_orto_crs(self):
+        # if self.dlg.defProjButton.clicked:
+        temp = QgsCoordinateReferenceSystem()
+        temp.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
+        self.dlg.crsSel.setCrs(temp)
 
-    #################################################################
+
+    ######################################################################
 
     def run(self):
         """Run method that performs all the real work"""
@@ -233,6 +256,9 @@ class volum:
 
 
 
+
+
+
         if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
@@ -240,7 +266,12 @@ class volum:
 
             ##################################################################################### CODIGO
 
+            ###PATHS
+            delaupath = "/home/kauevestena/.qgis2/processing/outputs/delau.shp"
+            xymeanpath  = "/home/kauevestena/.qgis2/processing/outputs/XYmean.shp"
+            point2spath = "/home/kauevestena/.qgis2/processing/outputs/datapoints2.shp"
             
+            ###PATHS
 
             self.dlg.botaoinput.clicked.connect
 
@@ -248,23 +279,43 @@ class volum:
             
             print filename
             
-            # path = "file://"+filename+"?type=csv&xField=X&yField=Y&spatialIndex=yes&subsetIndex=no&watchFile=yes"
-
             path2 = filename+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
 
             datapoints = QgsVectorLayer(path2, "pontos", "delimitedtext")
-            crs = datapoints.crs()
-            crs.createFromId(31982)
-            datapoints.setCrs(crs)
 
-            # print datapoints.crs
 
+                
+            datapoints.setCrs(self.dlg.crsSel.crs())
+
+
+            
+
+            processing.runalg("qgis:delaunaytriangulation",datapoints,delaupath)
+
+            triangles = QgsVectorLayer(delaupath,"triangles","ogr")
+
+            
+
+            processing.runalg("qgis:meancoordinates",datapoints,None,None,xymeanpath)
+
+            xymean = QgsVectorLayer(xymeanpath,"pmed","ogr")
+
+
+            ##passando todos para o CRS selecionado
+            triangles.setCrs(self.dlg.crsSel.crs())
+            xymean.setCrs(self.dlg.crsSel.crs())
+
+            ### projeto com o CRS escolhido
+            iface.mapCanvas().mapRenderer().setDestinationCrs(self.dlg.crsSel.crs())
+
+            #### adicionando na visualização
+            self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
+            # # self.add_layer_canvas(xymean)
 
 
-            processing.runalg("qgis:delaunaytriangulation",datapoints,"memory:")
 
 
             #####################################################################################
-            pass
+            # pass
             
