@@ -117,7 +117,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&lt;a href=&quot;https://docs.google.com/document/d/e/2PACX-1vQTYZGhZG2xfa9G2_Yf9uq9JTYj7jGwqAzZCd47dDj8Qfl4cwCQbkc7_0h0c272-ep2tqvEZ4xzh4rv/pub&quot;&gt;sobre&lt;/a&gt;</string>
+    <string>&lt;a href=&quot;https://docs.google.com/document/d/e/2PACX-1vQTYZGhZG2xfa9G2_Yf9uq9JTYj7jGwqAzZCd47dDj8Qfl4cwCQbkc7_0h0c272-ep2tqvEZ4xzh4rv/pub&quot;&gt; sobre &lt;/a&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
