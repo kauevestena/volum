@@ -64,6 +64,10 @@ def column(matrixList, i):
     return [row[i] for row in matrixList]
 
 
+computername = "kaue2"
+# computername = "kauevestena"
+#HITF = Handle In The Future
+
 
 #########################################################################
 
@@ -127,7 +131,7 @@ class volum:
         #muda seletor de CRS caso seja selecionado o orto
         self.dlg.defProjButton.clicked.connect(self.set_orto_crs)   
 
-        ## definição do "sobre"
+        ## definição do "sobre" 
         self.dlg.aboutDefProj.setOpenExternalLinks(True)
 
 
@@ -139,7 +143,7 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        self.dlg.input2.setText("/home/kauevestena/Documents/ex.csv") #COMMENT
+        self.dlg.input2.setText("/home/"+computername+"/Documents/ex.csv") #COMMENT 
 
 
 
@@ -311,9 +315,9 @@ class volum:
             ##################################################################################### CODIGO
 
             ###PATHS
-            delaupath = "/home/kauevestena/.qgis2/processing/outputs/delau.shp"
-            xymeanpath  = "/home/kauevestena/.qgis2/processing/outputs/XYmean.shp"
-            point2spath = "/home/kauevestena/.qgis2/processing/outputs/datapoints2.shp"
+            delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau.shp"  #HITF
+            xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean.shp" #HITF
+            point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints2.shp" #HITF
             
             ###PATHS
 
