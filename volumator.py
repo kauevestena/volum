@@ -21,9 +21,11 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
-from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
+from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
+from qgis.core import QgsField, QgsGeometry
 from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
@@ -47,10 +49,19 @@ def retrieve_att(layer,att_id,row_id):
     attrs = []
     for feature in iter:
         attrs.append(feature.attributes())
-
-    print attrs
         
     return attrs[row_id][att_id]
+
+def retrieve_atts(layer):
+    iter = layer.getFeatures()
+    attrs = []
+    for feature in iter:
+        attrs.append(feature.attributes())
+        
+    return attrs
+
+def column(matrixList, i):
+    return [row[i] for row in matrixList]
 
 
 
@@ -116,10 +127,6 @@ class volum:
         #muda seletor de CRS caso seja selecionado o orto
         self.dlg.defProjButton.clicked.connect(self.set_orto_crs)   
 
-
-        
-
-
         ## definição do "sobre"
         self.dlg.aboutDefProj.setOpenExternalLinks(True)
 
@@ -132,7 +139,7 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        # self.dlg.input2.setText("/home/kauevestena/Documents/ex.csv")
+        self.dlg.input2.setText("/home/kauevestena/Documents/ex.csv") #COMMENT
 
 
 
@@ -314,7 +321,7 @@ class volum:
 
             filename = self.dlg.input2.text()
             
-            print filename
+            # print filename
             
             path2 = filename+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
 
@@ -345,22 +352,78 @@ class volum:
 
 
 
-            if self.dlg.crsSel.crs() == crsOrt:
-                pass
+
+            # # # # # # # # # # # # #FUTURE FEATURE: IF CRS IS ORTHO, TRANSLADE ALL POINTS TO THE TOPOCENTER
+            # # # # # # # # if self.dlg.crsSel.crs() == crsOrt:
+            # # # # # # # #     pass
+
+            # # # # # # # # vlayer = datapoints
+            # # # # # # # # # u = QgsVectorLayerEditUtils( vlayer )
+            # # # # # # # # vlayer.beginEditCommand("Translate")
+            # # # # # # # # for feat in vlayer.getFeatures():
+            # # # # # # # #     ff = feat.id()
+            # # # # # # # #     # vlayer.translateFeature(ff,1000,1000)
+            # # # # # # # #     ox = feat.geometry().asPoint().x()
+            # # # # # # # #     oy = feat.geometry().asPoint().y()
+            # # # # # # # #     tx = 10000
+            # # # # # # # #     ty = 1000
+            # # # # # # # #     geom = QgsGeometry.fromPoint(QgsPoint(ox+tx,oy+ty))
+
+            # # # # # # # #     vlayer.dataProvider().changeGeometryValues({ ff : geom })
+
+            # # # # # # # #     vlayer.updateFeature(feat)
+            # # # # # # # #     # vlayer.updateExtents()
+
+            # # # # # # # #     ox2 = feat.geometry().asPoint().x()
+
+            # # # # # # # #     # print ox-ox2
+            # # # # # # # # # vlayer.beginEditCommand("Translate")
+            # # # # # # # # vlayer.commitChanges()
+            # # # # # # # # vlayer.endEditCommand()
+
+            # vlayer.updateExtents()
+
+            # # # # # # ok
+
+            # x = retrieve_att(datapoints,1,0)
 
 
-            # x = retrieve_att(xymean,1,0)
 
-            # for f in range(datapoints.featureCount()):
-            #     fid = f.id()
-            #     datapoints.translateFeature(fid,1000,1000)
-            # vlayer = datapoints
-            # u = QgsVectorLayerEditUtils( vlayer )
-            # vlayer.beginEditCommand('Translate')
-            # for f in vlayer.getFeatures():
-            #     f.id()
-            #     u.translateFeature(fid,100,100)
-            # vlayer.endEditCommand()
+            #definindo a maior e a menor altitude
+            MIN = min(column(retrieve_atts(datapoints),3))
+            MAX = max(column(retrieve_atts(datapoints),3))
+
+            ## DEFINIÇÃO DA ALTITUDE DE CALCULO
+            hcal = float(self.dlg.hCalc.text())
+
+            ## booleanos para apenas corte ou aterro
+            onlyC = True
+            onlyA = False
+            BOTH  = False
+
+            if hcal > MAX:
+                onlyC = False
+                onlyA = True
+
+            if hcal > MIN and hCal < MAX:
+                onlyC = onlyA = False
+                BOTH = True
+
+            
+            # Adicionando as altitudes aos triangulos
+
+            triangles.beginEditCommand("Attribute")
+            # triangles.addAttribute(QgsField("hP1",QVariant.Double))
+            triangles.dataProvider().addAttributes([QgsField("hP1",QVariant.Double),QgsField("hP2",QVariant.Double),QgsField("hP3",QVariant.Double)])
+
+            triangles.endEditCommand()
+
+            triangles.updateFields()
+            
+
+            
+
+
                     
 
 
@@ -373,9 +436,11 @@ class volum:
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
-            self.add_layer_canvas(xymean)  #COMMENT
+            # self.add_layer_canvas(xymean)  #COMMENT
 
 
             #####################################################################################
             # pass
+
+            print "end" #COMMENT
             
