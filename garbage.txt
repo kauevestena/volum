@@ -30,3 +30,33 @@
     # def select_output_file(self):
     #     filename = QFileDialog.getSaveFileName(volumDialog(), "Select output file ","", '*.txt')
     #     self.dlg.lineEdit.setText(filename)
+
+
+ACESSANDO O NOME DE UM CAMPO
+                fields = xymean.pendingFields()   
+            field_names = [field.name() for field in fields]
+            print fields.field(0).name()
+
+    def retrieve_att(self,layer,att_id,row_id):
+        iter = layer.getFeatures()
+        attrs = []
+        for feature in iter:
+            attrs.append(feature.attributes())
+        return attrs[att_id][row_id]
+
+
+
+            # fields = xymean.pendingFields()   
+            # field_names = [field.name() for field in fields]
+            # # print fields.field(0).name()
+            # # for elem in xymean.getFeatures():  
+            # #     print dict(zip(field_names, elem.attributes()))
+            # print fields.field(0).elem.attributes(0)
+
+            # # iterator = layer.getFeatures(QgsFeatureRequest().setFilterFid(1))
+                # # feature = next(iterator)
+            # # attrs = feature.attributes()
+            # print attrs[0]
+
+        # self.dlg.aboutDefProj.setText('''<a href='http://stackoverflow.com'>sobre</a>''')
+

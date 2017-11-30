@@ -23,7 +23,7 @@
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
-from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsCoordinateReferenceSystem
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
 from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
@@ -38,6 +38,23 @@ from volumator_dialog import volumDialog
 import os.path
 
 print "teste"
+
+
+###################################################################### GLOBAL
+
+def retrieve_att(layer,att_id,row_id):
+    iter = layer.getFeatures()
+    attrs = []
+    for feature in iter:
+        attrs.append(feature.attributes())
+
+    print attrs
+        
+    return attrs[row_id][att_id]
+
+
+
+#########################################################################
 
 
 class volum:
@@ -106,9 +123,22 @@ class volum:
         ## definição do "sobre"
         self.dlg.aboutDefProj.setOpenExternalLinks(True)
 
-        self.dlg.aboutDefProj.setText('''<a href='http://stackoverflow.com'>sobre</a>''')
+
+
+
+
 
         ##################################################################
+
+
+        # ####################### LINHAS A VIRAR COMENTARIO
+        # self.dlg.input2.setText("/home/kauevestena/Documents/ex.csv")
+
+
+
+        ######################
+
+
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -223,7 +253,7 @@ class volum:
         # remove the toolbar
         del self.toolbar
 
-    ################################################################ FUNÇOES
+    ################################################################ FUNÇOES-MEMBRO 
 
     def select_input_file(self):
         filename = QFileDialog.getOpenFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
@@ -243,9 +273,16 @@ class volum:
         self.dlg.crsSel.setCrs(temp)
 
 
+
+
     ######################################################################
 
     def run(self):
+        
+        #
+        crsOrt = QgsCoordinateReferenceSystem()
+        crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
+
         """Run method that performs all the real work"""
         # show the dialog
         self.dlg.show()
@@ -305,15 +342,38 @@ class volum:
             triangles.setCrs(self.dlg.crsSel.crs())
             xymean.setCrs(self.dlg.crsSel.crs())
 
+
+
+
+            if self.dlg.crsSel.crs() == crsOrt:
+                pass
+
+
+            # x = retrieve_att(xymean,1,0)
+
+            # for f in range(datapoints.featureCount()):
+            #     fid = f.id()
+            #     datapoints.translateFeature(fid,1000,1000)
+            # vlayer = datapoints
+            # u = QgsVectorLayerEditUtils( vlayer )
+            # vlayer.beginEditCommand('Translate')
+            # for f in vlayer.getFeatures():
+            #     f.id()
+            #     u.translateFeature(fid,100,100)
+            # vlayer.endEditCommand()
+                    
+
+
+
+            ######################################################DEVEM ESTAR NO FINAL DO CODIGO
+
             ### projeto com o CRS escolhido
             iface.mapCanvas().mapRenderer().setDestinationCrs(self.dlg.crsSel.crs())
 
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
-            # # self.add_layer_canvas(xymean)
-
-
+            self.add_layer_canvas(xymean)  #COMMENT
 
 
             #####################################################################################
