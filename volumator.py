@@ -45,23 +45,31 @@ print "teste"
 ###################################################################### GLOBAL
 
 def retrieve_att(layer,att_id,row_id):
-    iter = layer.getFeatures()
+    iterr = layer.getFeatures()
     attrs = []
-    for feature in iter:
+    for feature in iterr:
         attrs.append(feature.attributes())
-        
     return attrs[row_id][att_id]
 
 def retrieve_atts(layer):
-    iter = layer.getFeatures()
+    iterr = layer.getFeatures()
     attrs = []
-    for feature in iter:
+    for feature in iterr:
         attrs.append(feature.attributes())
-        
     return attrs
 
 def column(matrixList, i):
     return [row[i] for row in matrixList]
+
+def get_areas(layer):
+    # # # # #FUTURE : check if layer is a layer of polygons, 
+    # # # # # if not return empty list and a warning
+    iter = layer.getFeatures()
+    areas = []
+    for feature in iter:
+        areas.append(feature.geometry().area())
+    return areas
+        
 
 
 computername = "kaue2"
@@ -413,16 +421,59 @@ class volum:
                 onlyC = onlyA = False
                 BOTH = True
 
+            #vector with heights, indexes of points and finally height of each point
+            heigths = column(retrieve_atts(datapoints),3)
             
-            # Adicionando as altitudes aos triangulos
+            iP1 = column(retrieve_atts(triangles),0)
+            iP2 = column(retrieve_atts(triangles),1)
+            iP3 = column(retrieve_atts(triangles),2)
 
-            triangles.beginEditCommand("Attribute")
-            # triangles.addAttribute(QgsField("hP1",QVariant.Double))
-            triangles.dataProvider().addAttributes([QgsField("hP1",QVariant.Double),QgsField("hP2",QVariant.Double),QgsField("hP3",QVariant.Double)])
+            Hp1 = []
+            Hp2 = []
+            Hp3 = []
 
-            triangles.endEditCommand()
+            for ind in iP1:
+                Hp1.append(heigths[int(ind)])
+                Hp2.append(heigths[int(ind)])
+                Hp3.append(heigths[int(ind)])
 
-            triangles.updateFields()
+            print [len(Hp1),len(Hp2),len(Hp3),len(iP1),len(heigths)]
+
+            areas = get_areas(triangles)
+
+            print areas
+
+            
+
+
+            
+            # Adicionando as altitudes aos triangulos, area e demais calculos
+
+            # # # # # # # triangles.beginEditCommand("Attribute")
+            # # # # # # # # triangles.addAttribute(QgsField("hP1",QVariant.Double))
+            # # # # # # # triangles.dataProvider().addAttributes([QgsField("hP1",QVariant.Double),QgsField("hP2",QVariant.Double),QgsField("hP3",QVariant.Double)])
+
+            # # # # # # # provider = triangles.dataProvider()
+
+            # # # # # # # areas = [ feat.geometry().area() 
+            # # # # # # #         for feat in triangles.getFeatures() ]
+
+            # # # # # # # field = QgsField("area", QVariant.Double)
+            # # # # # # # provider.addAttributes([field])
+            # # # # # # # triangles.updateFields()
+
+            # # # # # # # idx = triangles.fieldNameIndex('area')
+
+            # # # # # # # for area in areas:
+            # # # # # # #     new_values = {idx : float(area)}
+            # # # # # # #     provider.changeAttributeValues({areas.index(area):new_values})
+
+            # # # # # # # idx2 = triangles.fieldNameIndex('hP1')
+            
+
+            # # # # # # # triangles.endEditCommand()
+
+            # # # # # # # triangles.updateFields()
             
 
             
