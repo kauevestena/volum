@@ -33,16 +33,18 @@ import resources
 
 ############
 import processing
+import time
+import shapely
 ############
 
 # Import the code for the dialog
 from volumator_dialog import volumDialog
 import os.path
 
-print "teste"
-
-
 ###################################################################### GLOBAL
+
+# # # #if shapely works, this will work:
+# # # print Point(0, 0).geom_type
 
 def retrieve_att(layer,att_id,row_id):
     iterr = layer.getFeatures()
@@ -61,6 +63,13 @@ def retrieve_atts(layer):
 def column(matrixList, i):
     return [row[i] for row in matrixList]
 
+def sum(lst):
+    sum = 0.0
+    for val in lst:
+        sum += val
+    return sum
+
+
 def get_areas(layer):
     # # # # #FUTURE : check if layer is a layer of polygons, 
     # # # # # if not return empty list and a warning
@@ -68,13 +77,54 @@ def get_areas(layer):
     areas = []
     for feature in iter:
         areas.append(feature.geometry().area())
-    return areas
-        
+        return areas
+
+def get_triangles(layer,H1,H2,H3):
+    iterr = layer.getFeatures()
+    triangles = []
+    i = 0
+    for feature in iterr:
+        # triang = feature.geometry().exportToWkt()
+        # print triang
+        triangles.append(kTriangle(feature,H1[i],H2[i],H3[i]))
+        i += 1
+    return triangles
+
+
+def get_datetime():
+    return time.strftime("%d-%m-%Y_%H-%M-%S")
+
+# def define_op
+
 
 
 computername = "kaue2"
 # computername = "kauevestena"
 #HITF = Handle In The Future
+
+print "teste "+get_datetime() #COMMENT
+
+# class kPoint:
+#     def __init__(self,x,y,z):
+#         self.x = x
+#         self.y = y
+#         self.z = z 
+
+
+
+
+class kTriangle:
+    triangWKT = ""
+    area = 0.0
+    # h1   = 0.0
+    # h2   = 0.0
+    # h3   = 0.0
+    def __init__(self,feature,h1,h2,h3):
+        self.triangWKT = feature.geometry().exportToWkt()
+        self.area = feature.geometry().area()
+        self.h1 = h1
+        self.h2 = h2
+        self.h3 = h3
 
 
 #########################################################################
@@ -434,17 +484,27 @@ class volum:
 
             for ind in iP1:
                 Hp1.append(heigths[int(ind)])
+
+            for ind in iP2:
                 Hp2.append(heigths[int(ind)])
+
+            for ind in iP3:
                 Hp3.append(heigths[int(ind)])
 
-            print [len(Hp1),len(Hp2),len(Hp3),len(iP1),len(heigths)]
+            # print [len(Hp1),len(Hp2),len(Hp3),len(iP1),len(heigths)] #COMMENT
 
-            areas = get_areas(triangles)
+            # areas = get_areas(triangles)
 
-            print areas
+            # print areas
 
+            # print [Hp1,Hp2,Hp3]
             
+            vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3)
 
+            # print vec_triangles[0].triangWKT
+            # print [vec_triangles[0].h1,vec_triangles[0].h2,vec_triangles[0].h3]
+
+            # print vec_triangles[0]
 
             
             # Adicionando as altitudes aos triangulos, area e demais calculos
