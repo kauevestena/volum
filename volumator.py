@@ -34,7 +34,7 @@ import resources
 ############
 import processing
 import time
-import shapely
+import math
 ############
 
 # Import the code for the dialog
@@ -45,6 +45,10 @@ import os.path
 
 # # # #if shapely works, this will work:
 # # # print Point(0, 0).geom_type
+
+# thx: https://gis.stackexchange.com/a/94215
+def euclidean_distance(point1,point2):
+    return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
 
 def retrieve_att(layer,att_id,row_id):
     iterr = layer.getFeatures()
@@ -79,14 +83,14 @@ def get_areas(layer):
         areas.append(feature.geometry().area())
         return areas
 
-def get_triangles(layer,H1,H2,H3):
+def get_triangles(layer,H1,H2,H3,op,hCalc):
     iterr = layer.getFeatures()
     triangles = []
     i = 0
     for feature in iterr:
         # triang = feature.geometry().exportToWkt()
         # print triang
-        triangles.append(kTriangle(feature,H1[i],H2[i],H3[i]))
+        triangles.append(kTriangle(feature,H1[i],H2[i],H3[i],op,hCalc))
         i += 1
     return triangles
 
@@ -94,7 +98,28 @@ def get_triangles(layer,H1,H2,H3):
 def get_datetime():
     return time.strftime("%d-%m-%Y_%H-%M-%S")
 
-# def define_op
+def define_op(MIN,MAX,hcal):
+    onlyC = True
+    onlyA = False
+    BOTH  = False
+
+    if hcal > MAX:
+        onlyC = False
+        onlyA = True
+
+    if hcal > MIN and hCal < MAX:
+        onlyC = onlyA = False
+        BOTH = True
+
+    op = 1
+
+    if onlyA:
+        op = 2
+    elif BOTH:
+        op = 3
+
+    print op
+    return op
 
 
 
@@ -111,20 +136,44 @@ print "teste "+get_datetime() #COMMENT
 #         self.z = z 
 
 
-
+def med3(v1,v2,v3):
+    return (v1+v2+v3)/3
 
 class kTriangle:
     triangWKT = ""
+    poly = None
     area = 0.0
-    # h1   = 0.0
-    # h2   = 0.0
-    # h3   = 0.0
-    def __init__(self,feature,h1,h2,h3):
+    # vH1 = 0.0
+    # vH2 = 0.0
+    # vH3 = 0.0
+    vH = 0.0
+    volCt = 0.0
+    volAt = 0.0
+    hmed = 0.0
+    p = [] #
+    def __init__(self,feature,h1,h2,h3,op,hCalc):
+        self.poly = feature.geometry().asPolygon()
         self.triangWKT = feature.geometry().exportToWkt()
         self.area = feature.geometry().area()
         self.h1 = h1
         self.h2 = h2
         self.h3 = h3
+        self.hmed = med3(self.h1,self.h2,self.h3)
+        if op == 1:
+            self.vH = self.hmed - hCalc
+            self.volCt = self.area * self.vH 
+        elif op == 2:
+            self.vH = hCalc - self.hmed
+            self.volAt = area *  self.vH
+        else:
+            self.vH1 = self.h1 - hCalc
+            self.vH2 = self.h2 - hCalc
+            self.vH3 = self.h3 - hCalc
+            dist1 = euclidean_distance(self.poly[0][0],self.poly[0][1])
+            dist1 = euclidean_distance(self.poly[0][1],self.poly[0][2])
+            dist1 = euclidean_distance(self.poly[0][2],self.poly[0][0])
+            
+
 
 
 #########################################################################
@@ -459,17 +508,7 @@ class volum:
             hcal = float(self.dlg.hCalc.text())
 
             ## booleanos para apenas corte ou aterro
-            onlyC = True
-            onlyA = False
-            BOTH  = False
 
-            if hcal > MAX:
-                onlyC = False
-                onlyA = True
-
-            if hcal > MIN and hCal < MAX:
-                onlyC = onlyA = False
-                BOTH = True
 
             #vector with heights, indexes of points and finally height of each point
             heigths = column(retrieve_atts(datapoints),3)
@@ -491,6 +530,8 @@ class volum:
             for ind in iP3:
                 Hp3.append(heigths[int(ind)])
 
+            op = define_op(MIN,MAX,hcal)
+            
             # print [len(Hp1),len(Hp2),len(Hp3),len(iP1),len(heigths)] #COMMENT
 
             # areas = get_areas(triangles)
@@ -499,12 +540,9 @@ class volum:
 
             # print [Hp1,Hp2,Hp3]
             
-            vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3)
+            vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3,op,hcal)
 
-            # print vec_triangles[0].triangWKT
-            # print [vec_triangles[0].h1,vec_triangles[0].h2,vec_triangles[0].h3]
-
-            # print vec_triangles[0]
+            print euclidean_distance(vec_triangles[0].poly[0][0],vec_triangles[0].poly[0][1])
 
             
             # Adicionando as altitudes aos triangulos, area e demais calculos
