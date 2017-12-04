@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>898</width>
+    <width>937</width>
     <height>378</height>
    </rect>
   </property>
@@ -184,7 +184,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QPushButton" name="botaooutput">
+  <widget class="QPushButton" name="botaoOutput">
    <property name="geometry">
     <rect>
      <x>710</x>
@@ -229,7 +229,7 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_7">
+  <widget class="QLabel" name="lMIN">
    <property name="geometry">
     <rect>
      <x>170</x>

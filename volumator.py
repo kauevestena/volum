@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, QLocale
+# import QString
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
 from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
@@ -46,8 +47,9 @@ import os.path
 # # # #if shapely works, this will work:
 # # # print Point(0, 0).geom_type
 
-# thx: https://gis.stackexchange.com/a/94215
+
 def euclidean_distance(point1,point2):
+# thx: https://gis.stackexchange.com/a/94215
     return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
 
 def retrieve_att(layer,att_id,row_id):
@@ -169,6 +171,9 @@ def triangleType(diffs):
         print "Algo ERRADO!"
         return -1
 
+def sum2abs(v1,v2):
+    return abs(v1)+abs(v2)
+
 class kTriangle:
     triangWKT = ""
     poly = None
@@ -182,6 +187,8 @@ class kTriangle:
     volAt = 0.0
     hmed = 0.0
     p = [] #
+    interPT1 = None
+    interPT2 = None
     def __init__(self,feature,h1,h2,h3,op,hCalc):
         self.poly = feature.geometry().asPolygon()
         self.triangWKT = feature.geometry().exportToWkt()
@@ -190,6 +197,7 @@ class kTriangle:
         self.h2 = h2
         self.h3 = h3
         self.hmed = med3(self.h1,self.h2,self.h3)
+        self.interPT1 = feature.geometry().interpolate(210).asPoint() #NEXT
         if op == 1:
             self.vH = self.hmed - hCalc
             self.volCt = self.area * self.vH 
@@ -206,11 +214,19 @@ class kTriangle:
             dist1 = euclidean_distance(self.poly[0][2],self.poly[0][0])
             case = triangleType(vhs)
             if case == 1:
-                pass
+                v12 = sum2abs(vhs[0],vhs[1])
+                v23 = sum2abs(vhs[1],vhs[2])
             if case == 2:
-                pass
+                v12 = sum2abs(vhs[0],vhs[1])
+                v13 = sum2abs(vhs[0],vhs[2])
             if case == 3:
-                pass
+                v23 = sum2abs(vhs[1],vhs[2])
+                v13 = sum2abs(vhs[0],vhs[2])
+
+    # def convToListOfQstring(list):
+    #     out = []
+    #     for val in list:
+    #         out.append(QString(val))
 
 
 
@@ -266,6 +282,16 @@ class volum:
         ##botao input
         self.dlg.input2.clear()
         self.dlg.botaoinput.clicked.connect(self.select_input_file)
+
+        ##botao output
+        self.dlg.outputTxt.clear()
+        self.dlg.botaoOutput.clicked.connect(self.select_output_file)
+
+        #botao minmax
+        self.dlg.obMaxMin.clicked.connect(self.obtain_max_min)
+
+        #botao ids
+        self.dlg.obIDs.clicked.connect(self.obtain_ids)
 
         ###botao de seleciona CRS #31982
         temp = QgsCoordinateReferenceSystem()
@@ -421,6 +447,10 @@ class volum:
         filename = QFileDialog.getOpenFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
         self.dlg.input2.setText(filename)
 
+    def select_output_file(self):
+        filename = QFileDialog.getSaveFileName(self.dlg, "Selecione o Arquivo de saida ","", '*.txt')
+        self.dlg.outputTxt.setText(filename)
+
 
     def add_layer_canvas(self,layer):
         # canvas = QgsMapCanvas()
@@ -433,6 +463,26 @@ class volum:
         temp = QgsCoordinateReferenceSystem()
         temp.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
         self.dlg.crsSel.setCrs(temp)
+
+    def obtain_max_min(self):
+        if self.dlg.input2.text() != "":
+            path = self.dlg.input2.text()+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
+            layer = QgsVectorLayer(path, "pontosTemp", "delimitedtext")
+            self.dlg.lMAX.setText(str(max(column(retrieve_atts(layer),3))))
+            self.dlg.lMIN.setText(str(min(column(retrieve_atts(layer),3))))
+            layer = None
+
+    def obtain_ids(self):
+        if self.dlg.input2.text() != "":
+            path = self.dlg.input2.text()+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
+            layer = QgsVectorLayer(path, "pontosTemp", "delimitedtext")
+            idList = column(retrieve_atts(layer),0)
+            idList2 = []
+            for val in idList:
+                idList2.append(str(val))
+            self.dlg.oriSelec.addItems(idList2)
+            self.dlg.stationSelec.addItems(idList2)
+            layer = None
 
 
 
@@ -586,6 +636,9 @@ class volum:
             # print [Hp1,Hp2,Hp3]
             
             vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3,op,hcal)
+
+            print vec_triangles[0].poly[0]
+            print [vec_triangles[0].interPT1[0],vec_triangles[0].interPT1[1]]
 
             
             # Adicionando as altitudes aos triangulos, area e demais calculos
