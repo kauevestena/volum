@@ -21,7 +21,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, QLocale
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
 from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
@@ -118,7 +118,7 @@ def define_op(MIN,MAX,hcal):
     elif BOTH:
         op = 3
 
-    print op
+    # print op
     return op
 
 
@@ -139,6 +139,36 @@ print "teste "+get_datetime() #COMMENT
 def med3(v1,v2,v3):
     return (v1+v2+v3)/3
 
+def r3(X1,Y1,X2):
+    return (Y1*X2)/X1
+
+def sameSignal(v1,v2):
+    if   v1 > 0.0 and v2 > 0.0 :
+        return True
+    elif v1 < 0.0 and v2 < 0.0 :
+        return True
+    else:
+        return False
+
+def triangleType(diffs):
+    #to define in wich segments the point will
+    # need to be interpolated
+    #case 1: 1 2,2 3
+    #case 2: 1 2,3 1
+    #case 3: 2 3,3 1
+    c12 = not sameSignal(diffs[0],diffs[1])
+    c23 = not sameSignal(diffs[1],diffs[2])
+    c31 = not sameSignal(diffs[2],diffs[0])
+    if C12 and c23:
+        return 1
+    elif c12 and c31:
+        return 2
+    elif c31 and c23:
+        return 3
+    else:
+        print "Algo ERRADO!"
+        return -1
+
 class kTriangle:
     triangWKT = ""
     poly = None
@@ -147,6 +177,7 @@ class kTriangle:
     # vH2 = 0.0
     # vH3 = 0.0
     vH = 0.0
+    vhs = []
     volCt = 0.0
     volAt = 0.0
     hmed = 0.0
@@ -166,13 +197,20 @@ class kTriangle:
             self.vH = hCalc - self.hmed
             self.volAt = area *  self.vH
         else:
-            self.vH1 = self.h1 - hCalc
-            self.vH2 = self.h2 - hCalc
-            self.vH3 = self.h3 - hCalc
+            # self.vH1 = self.h1 - hCalc
+            # self.vH2 = self.h2 - hCalc
+            # self.vH3 = self.h3 - hCalc
+            vhs = [self.h1 - hCalc,self.h2 - hCalc,self.h3 - hCalc]
             dist1 = euclidean_distance(self.poly[0][0],self.poly[0][1])
             dist1 = euclidean_distance(self.poly[0][1],self.poly[0][2])
             dist1 = euclidean_distance(self.poly[0][2],self.poly[0][0])
-            
+            case = triangleType(vhs)
+            if case == 1:
+                pass
+            if case == 2:
+                pass
+            if case == 3:
+                pass
 
 
 
@@ -241,7 +279,12 @@ class volum:
         ## definição do "sobre" 
         self.dlg.aboutDefProj.setOpenExternalLinks(True)
 
+        #trocando virgula (argh) por ponto
+        self.dlg.hCalc.setLocale(QLocale("UnitedStates")) #LANGUAGE
+        self.dlg.hEquip.setLocale(QLocale("UnitedStates")) #LANGUAGE
 
+        #hiding everithing that is not useful at the beggining #DO
+        # self.dlg.hEquip.hide()
 
 
 
@@ -250,7 +293,8 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        self.dlg.input2.setText("/home/"+computername+"/Documents/ex.csv") #COMMENT 
+        self.dlg.input2.setText("/home/"+computername+"/Documents/ex.csv") #COMMENT
+        self.dlg.outputTxt.setText("/home/"+computername+"/report.txt") #COMMENT
 
 
 
@@ -425,6 +469,7 @@ class volum:
             delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau.shp"  #HITF
             xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean.shp" #HITF
             point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints2.shp" #HITF
+            # outpath = "/home/"+computername+"/report.txt" #HITF
             
             ###PATHS
 
@@ -541,8 +586,6 @@ class volum:
             # print [Hp1,Hp2,Hp3]
             
             vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3,op,hcal)
-
-            print euclidean_distance(vec_triangles[0].poly[0][0],vec_triangles[0].poly[0][1])
 
             
             # Adicionando as altitudes aos triangulos, area e demais calculos
