@@ -109,7 +109,7 @@ def define_op(MIN,MAX,hcal):
         onlyC = False
         onlyA = True
 
-    if hcal > MIN and hCal < MAX:
+    if hcal > MIN and hcal < MAX:
         onlyC = onlyA = False
         BOTH = True
 
@@ -125,8 +125,8 @@ def define_op(MIN,MAX,hcal):
 
 
 
-computername = "kaue2"
-# computername = "kauevestena"
+# computername = "kaue2"
+computername = "kauevestena"
 #HITF = Handle In The Future
 
 print "teste "+get_datetime() #COMMENT
@@ -161,15 +161,15 @@ def triangleType(diffs):
     c12 = not sameSignal(diffs[0],diffs[1])
     c23 = not sameSignal(diffs[1],diffs[2])
     c31 = not sameSignal(diffs[2],diffs[0])
-    if C12 and c23:
+    # print [c12,c23,c31,diffs]
+    if c12 and c23:
         return 1
     elif c12 and c31:
         return 2
     elif c31 and c23:
         return 3
     else:
-        print "Algo ERRADO!"
-        return -1
+        return 4
 
 def sum2abs(v1,v2):
     return abs(v1)+abs(v2)
@@ -203,7 +203,7 @@ class kTriangle:
             self.volCt = self.area * self.vH 
         elif op == 2:
             self.vH = hCalc - self.hmed
-            self.volAt = area *  self.vH
+            self.volAt = self.area *  self.vH
         else:
             # self.vH1 = self.h1 - hCalc
             # self.vH2 = self.h2 - hCalc
@@ -213,13 +213,19 @@ class kTriangle:
             dist1 = euclidean_distance(self.poly[0][1],self.poly[0][2])
             dist1 = euclidean_distance(self.poly[0][2],self.poly[0][0])
             case = triangleType(vhs)
-            if case == 1:
+            if case == 4:
+                self.vH = med3(vhs[0],vhs[1],vhs[2])
+                if self.vH > 0:
+                    self.volCt = self.area * self.vH
+                else :
+                    self.volAt = self.area * abs(self.vH)
+            elif case == 1:
                 v12 = sum2abs(vhs[0],vhs[1])
                 v23 = sum2abs(vhs[1],vhs[2])
-            if case == 2:
+            elif case == 2:
                 v12 = sum2abs(vhs[0],vhs[1])
                 v13 = sum2abs(vhs[0],vhs[2])
-            if case == 3:
+            elif case == 3:
                 v23 = sum2abs(vhs[1],vhs[2])
                 v13 = sum2abs(vhs[0],vhs[2])
 
@@ -275,6 +281,8 @@ class volum:
        
        #####################################################################
 
+        self.dlg.hCalc.setMaximum(100000.0)
+
 
         # self.dlg.lineEdit.clear()
         # self.dlg.pushButton.clicked.connect(self.select_output_file)
@@ -308,6 +316,7 @@ class volum:
         #trocando virgula (argh) por ponto
         self.dlg.hCalc.setLocale(QLocale("UnitedStates")) #LANGUAGE
         self.dlg.hEquip.setLocale(QLocale("UnitedStates")) #LANGUAGE
+        self.dlg.hEquip.setValue(1.5)
 
         #hiding everithing that is not useful at the beggining #DO
         # self.dlg.hEquip.hide()
@@ -640,6 +649,8 @@ class volum:
             print vec_triangles[0].poly[0]
             print [vec_triangles[0].interPT1[0],vec_triangles[0].interPT1[1]]
 
+
+
             
             # Adicionando as altitudes aos triangulos, area e demais calculos
 
@@ -678,6 +689,44 @@ class volum:
 
 
             ######################################################DEVEM ESTAR NO FINAL DO CODIGO
+
+            # # #Relatorio de saida
+            if self.dlg.outputTxt.text()  != "":
+                file = open(self.dlg.outputTxt.text(),"w")
+                file.write("############## ~~VOLUMATOR 0.1 ~~ ##############\n")
+                file.write("        Relatorio de Saida do Processamento\n\n")
+
+                sumCt = 0.0
+                sumAt = 0.0
+                sumArea = 0.0
+
+                for tri in vec_triangles:
+                    sumCt   += tri.volCt
+                    sumAt   += tri.volAt
+                    sumArea += tri.area
+
+                nl = "\n"
+
+                file.write("Volume de Corte: " +str(sumCt)+" m3 (metros cubicos)"+nl)
+                file.write("Volume de Aterro: "+str(sumAt)+" m3 (metros cubicos)"+nl+nl)
+
+                file.write("Dados de Entrada: "+nl)
+                file.write("Arquivo de Entrada: "+self.dlg.input2.text()+nl)
+                file.write("Altura (ou \"cota\") utilizada para calculo: "+str(hcal)+nl)
+                file.write("Altura Max. "+str(MAX)+nl)
+                file.write("Altura Min. "+str(MIN)+nl)
+                if hcal < MIN:
+                    file.write("Altura de passagem (mesmo volume de Corte e Aterro): "+str(hcal+(sumCt/sumArea))+nl)
+
+
+                file.close()
+
+                
+
+
+            # # ####
+
+
 
             ### projeto com o CRS escolhido
             iface.mapCanvas().mapRenderer().setDestinationCrs(self.dlg.crsSel.crs())
