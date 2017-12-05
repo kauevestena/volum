@@ -26,7 +26,7 @@ from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVa
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
 from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
-from qgis.core import QgsField, QgsGeometry
+from qgis.core import QgsField, QgsGeometry, QgsFeature
 from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
@@ -141,7 +141,7 @@ print "teste "+get_datetime() #COMMENT
 def med3(v1,v2,v3):
     return (v1+v2+v3)/3
 
-def r3(X1,Y1,X2):
+def reg3(X1,Y1,X2):
     return (Y1*X2)/X1
 
 def sameSignal(v1,v2):
@@ -186,9 +186,12 @@ class kTriangle:
     volCt = 0.0
     volAt = 0.0
     hmed = 0.0
-    p = [] #
+    # p = [] #
     interPT1 = None
     interPT2 = None
+    dp1 = 0.0
+    dp2 = 0.0
+    case = 4
     def __init__(self,feature,h1,h2,h3,op,hCalc):
         self.poly = feature.geometry().asPolygon()
         self.triangWKT = feature.geometry().exportToWkt()
@@ -197,7 +200,7 @@ class kTriangle:
         self.h2 = h2
         self.h3 = h3
         self.hmed = med3(self.h1,self.h2,self.h3)
-        self.interPT1 = feature.geometry().interpolate(210).asPoint() #NEXT
+        # self.interPT1 = feature.geometry().interpolate(210).asPoint() #NEXT
         if op == 1:
             self.vH = self.hmed - hCalc
             self.volCt = self.area * self.vH 
@@ -209,25 +212,55 @@ class kTriangle:
             # self.vH2 = self.h2 - hCalc
             # self.vH3 = self.h3 - hCalc
             vhs = [self.h1 - hCalc,self.h2 - hCalc,self.h3 - hCalc]
-            dist1 = euclidean_distance(self.poly[0][0],self.poly[0][1])
-            dist1 = euclidean_distance(self.poly[0][1],self.poly[0][2])
-            dist1 = euclidean_distance(self.poly[0][2],self.poly[0][0])
-            case = triangleType(vhs)
-            if case == 4:
+            dist12 = euclidean_distance(self.poly[0][0],self.poly[0][1])
+            dist23 = euclidean_distance(self.poly[0][1],self.poly[0][2])
+            dist31 = euclidean_distance(self.poly[0][2],self.poly[0][0])
+            self.case = triangleType(vhs)
+            if self.case == 4:
                 self.vH = med3(vhs[0],vhs[1],vhs[2])
                 if self.vH > 0:
                     self.volCt = self.area * self.vH
                 else :
                     self.volAt = self.area * abs(self.vH)
-            elif case == 1:
+            elif self.case == 1:
                 v12 = sum2abs(vhs[0],vhs[1])
                 v23 = sum2abs(vhs[1],vhs[2])
-            elif case == 2:
+                ditp12 = reg3(v12,dist12,abs(vhs[0]))
+                ditp23 = reg3(v23,dist23,abs(vhs[1]))
+                l12 = QgsGeometry.fromPolyline([self.poly[0][0],self.poly[0][1]])
+                l23 = QgsGeometry.fromPolyline([self.poly[0][1],self.poly[0][2]])
+                self.interPT1 = l12.interpolate(ditp12).asPoint()
+                self.interPT2 = l23.interpolate(ditp23).asPoint()
+                self.dp1 = ditp12
+                self.dp2 = ditp23
+                self.volAt += 0.0
+                self.volCt += 0.0
+            elif self.case == 2:
                 v12 = sum2abs(vhs[0],vhs[1])
-                v13 = sum2abs(vhs[0],vhs[2])
-            elif case == 3:
+                v31 = sum2abs(vhs[0],vhs[2])
+                ditp12 = reg3(v12,dist12,abs(vhs[0]))
+                ditp31 = reg3(v31,dist31,abs(vhs[2]))
+                l12 = QgsGeometry.fromPolyline([self.poly[0][0],self.poly[0][1]])
+                l31 = QgsGeometry.fromPolyline([self.poly[0][2],self.poly[0][0]])
+                self.interPT1 = l12.interpolate(ditp12).asPoint()
+                self.interPT2 = l31.interpolate(ditp31).asPoint()
+                self.dp1 = ditp12
+                self.dp2 = ditp31
+                self.volAt += 0.0
+                self.volCt += 0.0
+            elif self.case == 3:
                 v23 = sum2abs(vhs[1],vhs[2])
-                v13 = sum2abs(vhs[0],vhs[2])
+                v31 = sum2abs(vhs[0],vhs[2])
+                ditp23 = reg3(v23,dist23,abs(vhs[1]))
+                ditp31 = reg3(v31,dist31,abs(vhs[2]))
+                l23 = QgsGeometry.fromPolyline([self.poly[0][1],self.poly[0][2]])
+                l31 = QgsGeometry.fromPolyline([self.poly[0][2],self.poly[0][0]])
+                self.interPT1 = l23.interpolate(ditp23).asPoint()
+                self.interPT2 = l31.interpolate(ditp31).asPoint()
+                self.dp1 = ditp23
+                self.dp2 = ditp31
+                self.volAt += 0.0
+                self.volCt += 0.0
 
     # def convToListOfQstring(list):
     #     out = []
@@ -528,6 +561,7 @@ class volum:
             delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau.shp"  #HITF
             xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean.shp" #HITF
             point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints2.shp" #HITF
+            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour.shp" #HITF
             # outpath = "/home/"+computername+"/report.txt" #HITF
             
             ###PATHS
@@ -646,8 +680,41 @@ class volum:
             
             vec_triangles = get_triangles(triangles,Hp1,Hp2,Hp3,op,hcal)
 
-            print vec_triangles[0].poly[0]
-            print [vec_triangles[0].interPT1[0],vec_triangles[0].interPT1[1]]
+            # print vec_triangles[0].poly[0]
+            # print [vec_triangles[0].interPT1[0],vec_triangles[0].interPT1[1]]
+            
+            #geracao da polilinha da curva, quando aplicavel
+            if op == 3:
+                # poly = []
+                # distList = []
+                contour = QgsVectorLayer("Point","line2","memory")
+                contour.setCrs(self.dlg.crsSel.crs())
+                prov = contour.dataProvider()
+                prov.addAttributes([QgsField("dist", QVariant.Double)])
+                for triang in vec_triangles:
+                    if triang.case != 4:
+                        f1 = QgsFeature()
+                        f2 = QgsFeature()
+                        f1.setAttributes([triang.dp1])
+                        f2.setAttributes([triang.dp2])
+                        f1.setGeometry(QgsGeometry.fromPoint(triang.interPT1))
+                        f2.setGeometry(QgsGeometry.fromPoint(triang.interPT2))
+                        prov.addFeatures([f1,f2])
+                        # poly.append(triang.interPT1)
+                        # poly.append(triang.interPT2)
+                        # distList.append(triang.dp1)
+                        # distList.append(triang.dp2)
+                # line = QgsGeometry.fromPolyline(poly)
+                # prov = contour.dataProvider()
+                # feat = QgsFeature()
+                # feat.setGeometry(line)
+                # prov.addFeatures([feat])
+                contour.updateFields()
+                contour.updateExtents()
+
+
+
+                
 
 
 
@@ -720,10 +787,6 @@ class volum:
 
 
                 file.close()
-
-                
-
-
             # # ####
 
 
@@ -734,6 +797,7 @@ class volum:
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
+            self.add_layer_canvas(contour)
             # self.add_layer_canvas(xymean)  #COMMENT
 
 
