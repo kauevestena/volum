@@ -36,6 +36,7 @@ import resources
 import processing
 import time
 import math
+import os
 ############
 
 # Import the code for the dialog
@@ -46,6 +47,35 @@ import os.path
 
 # # # #if shapely works, this will work:
 # # # print Point(0, 0).geom_type
+
+# def regTetrahVol()
+
+def deleteIfExists(path):
+    if os.path.isfile(path):
+        os.remove(path)
+
+
+crsOrt = QgsCoordinateReferenceSystem()
+crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
+
+def dotProduct(p1,p2):
+    return p1[0]*p2[0]+p1[1]*p2[1]
+
+def crossProduct(p1,p2):
+    x = p1[2]*p2[3]-p1[3]*p2[2]
+    y = p1[3]*p2[1]-p1[1]*p2[3]
+    z = p1[1]*p2[2]-p1[2]*p2[1]
+    return (x,y,z)
+
+def tupleDiff(p1,p2):
+    return (p1[0]-p2[0],p1[1]-p2[1],p1[2]-p2[2])
+
+def tetrahedVolum(A,B,C,D):
+    D1 = tupleDiff(A,D)
+    D2 = tupleDiff(B,D)
+    D3 = tupleDiff(C,D)
+
+    return abs(dotProduct(D1,crossProduct(D2,D3)))/6
 
 
 def euclidean_distance(point1,point2):
@@ -334,10 +364,14 @@ class volum:
         #botao ids
         self.dlg.obIDs.clicked.connect(self.obtain_ids)
 
+        #botao clear
+        self.dlg.clearAll.clicked.connect(self.clearFields)
+
         ###botao de seleciona CRS #31982
         temp = QgsCoordinateReferenceSystem()
         temp.createFromId(31982)
-        self.dlg.crsSel.setCrs(temp)
+        # self.dlg.crsSel.setCrs(temp)
+        self.dlg.crsSel.setCrs(crsOrt)
 
 
         #muda seletor de CRS caso seja selecionado o orto
@@ -361,7 +395,7 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        self.dlg.input2.setText("/home/"+computername+"/Documents/ex.csv") #COMMENT
+        self.dlg.input2.setText("/home/"+computername+"/Documents/ex2.csv") #COMMENT
         self.dlg.outputTxt.setText("/home/"+computername+"/report.txt") #COMMENT
 
 
@@ -526,6 +560,17 @@ class volum:
             self.dlg.stationSelec.addItems(idList2)
             layer = None
 
+    def clearFields(self):
+        self.dlg.input2.setText("")
+        self.dlg.outputTxt.setText("")
+        self.dlg.lMAX.setText("-")
+        self.dlg.lMIN.setText("-")
+        self.dlg.hCalc.setValue(0.00)
+        self.dlg.hEquip.setValue(0.00)
+        self.dlg.calcLoc.setChecked(False)
+        self.dlg.oriSelec.clear()
+        self.dlg.stationSelec.clear()
+        self.dlg.crsSel.setCrs(QgsCoordinateReferenceSystem())
 
 
 
@@ -534,8 +579,6 @@ class volum:
     def run(self):
         
         #
-        crsOrt = QgsCoordinateReferenceSystem()
-        crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
 
         """Run method that performs all the real work"""
         # show the dialog
@@ -558,11 +601,16 @@ class volum:
             ##################################################################################### CODIGO
 
             ###PATHS
-            delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau.shp"  #HITF
-            xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean.shp" #HITF
-            point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints2.shp" #HITF
-            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour.shp" #HITF
+            delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau3.shp"  #HITF
+            xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
+            point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
+            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour2.shp" #HITF
             # outpath = "/home/"+computername+"/report.txt" #HITF
+
+            deleteIfExists(delaupath) #CAREFUL
+            # deleteIfExists(xymeanpath)
+            # deleteIfExists(point2spath)
+            # deleteIfExists(contourpath)
             
             ###PATHS
 
@@ -650,6 +698,8 @@ class volum:
 
             #vector with heights, indexes of points and finally height of each point
             heigths = column(retrieve_atts(datapoints),3)
+
+            # print heigths
             
             iP1 = column(retrieve_atts(triangles),0)
             iP2 = column(retrieve_atts(triangles),1)
@@ -748,6 +798,11 @@ class volum:
             # # # # # # # triangles.updateFields()
             
 
+            #### Calculos e geração dos dados para a planilha de locacao
+            if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
+                if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
+                    pass
+
             
 
 
@@ -771,19 +826,24 @@ class volum:
                     sumCt   += tri.volCt
                     sumAt   += tri.volAt
                     sumArea += tri.area
+                    # print tri.area
 
                 nl = "\n"
 
                 file.write("Volume de Corte: " +str(sumCt)+" m3 (metros cubicos)"+nl)
                 file.write("Volume de Aterro: "+str(sumAt)+" m3 (metros cubicos)"+nl+nl)
 
+
+                file.write("Area Total: "+str(sumArea)+" m2 (metros quadrados)"+nl+nl+nl)
+
                 file.write("Dados de Entrada: "+nl)
                 file.write("Arquivo de Entrada: "+self.dlg.input2.text()+nl)
                 file.write("Altura (ou \"cota\") utilizada para calculo: "+str(hcal)+nl)
                 file.write("Altura Max. "+str(MAX)+nl)
                 file.write("Altura Min. "+str(MIN)+nl)
-                if hcal < MIN:
+                if hcal < MIN and sumArea != 0:
                     file.write("Altura de passagem (mesmo volume de Corte e Aterro): "+str(hcal+(sumCt/sumArea))+nl)
+                    pass
 
 
                 file.close()
@@ -797,7 +857,8 @@ class volum:
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
-            self.add_layer_canvas(contour)
+            if op == 3:
+                self.add_layer_canvas(contour)
             # self.add_layer_canvas(xymean)  #COMMENT
 
 
