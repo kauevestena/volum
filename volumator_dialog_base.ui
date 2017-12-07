@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>937</width>
-    <height>378</height>
+    <width>918</width>
+    <height>393</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -139,7 +139,7 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>30</x>
      <y>110</y>
      <width>271</width>
      <height>21</height>
@@ -280,9 +280,9 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>710</x>
-     <y>170</y>
-     <width>181</width>
+     <x>460</x>
+     <y>130</y>
+     <width>111</width>
      <height>21</height>
     </rect>
    </property>
@@ -293,7 +293,7 @@
     </font>
    </property>
    <property name="text">
-    <string>altura instalac. equip (m):</string>
+    <string>Espaçamento:</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -315,8 +315,8 @@
   <widget class="QCheckBox" name="calcLoc">
    <property name="geometry">
     <rect>
-     <x>550</x>
-     <y>110</y>
+     <x>470</x>
+     <y>100</y>
      <width>181</width>
      <height>22</height>
     </rect>
@@ -328,7 +328,7 @@
   <widget class="QDoubleSpinBox" name="hCalc">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>340</x>
      <y>100</y>
      <width>101</width>
      <height>41</height>
@@ -346,7 +346,7 @@
    <property name="geometry">
     <rect>
      <x>750</x>
-     <y>200</y>
+     <y>230</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -430,6 +430,71 @@
    </property>
    <property name="text">
     <string>obter IDs</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>100</y>
+     <width>160</width>
+     <height>80</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="vl1">
+    <item>
+     <widget class="QRadioButton" name="plan">
+      <property name="text">
+       <string>Plano</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="trid">
+      <property name="text">
+       <string>3D</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="both">
+      <property name="text">
+       <string>Ambos</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QDoubleSpinBox" name="espac">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>130</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
+    <rect>
+     <x>700</x>
+     <y>200</y>
+     <width>191</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Altura Instalacao Equip (m):</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

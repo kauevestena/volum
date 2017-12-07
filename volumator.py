@@ -25,7 +25,7 @@ from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVa
 # import QString
 from PyQt4.QtGui import QAction, QIcon, QFileDialog
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
-from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils
+from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils,QgsExpression
 from qgis.core import QgsField, QgsGeometry, QgsFeature
 from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
 from qgis.utils import iface
@@ -359,7 +359,10 @@ class volum:
        #####################################################################
 
         self.dlg.hCalc.setMaximum(100000.0)
+        self.dlg.espac.setMinimum(0.1)
 
+        #botao "3D"
+        self.dlg.trid.setChecked(True)
 
         # self.dlg.lineEdit.clear()
         # self.dlg.pushButton.clicked.connect(self.select_output_file)
@@ -586,6 +589,10 @@ class volum:
         self.dlg.oriSelec.clear()
         self.dlg.stationSelec.clear()
         self.dlg.crsSel.setCrs(QgsCoordinateReferenceSystem())
+        self.dlg.both.setChecked(False)
+        self.dlg.plan.setChecked(False)
+        self.dlg.trid.setChecked(False)
+        self.dlg.espac.setValue(self.dlg.espac.minimum())    #espac
 
 
 
@@ -857,11 +864,33 @@ class volum:
 
             # # # # # # # triangles.updateFields()
             
-
+            print "pass1" #COMMENT
             #### Calculos e geração dos dados para a planilha de locacao
             if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
                 if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
-                    pass
+                    expEst = QgsExpression("ID = '"+self.dlg.stationSelec.currentText()+"'")
+                    expOri = QgsExpression("ID = '"+self.dlg.oriSelec.currentText()+"'")
+
+                    reqEst = QgsFeatureRequest(expEst)
+                    reqOri = QgsFeatureRequest(expOri)
+
+                    itEst = datapoints.getFeatures(reqEst)
+                    itOri = datapoints.getFeatures(reqOri)
+
+                    featEst = itEst.next()
+                    featOri = itOri.next()
+
+                    Est = featEst.geometry().asPoint()
+                    Ori = featOri.geometry().asPoint()
+
+                    zEst = featEst[3]
+                    zOri = featOri[3]
+
+                    Est = (Est[0],Est[1],zEst)
+                    Ori = (Ori[0],Ori[1],zOri)
+
+                    print Est
+                    print Ori
 
             
 
@@ -927,5 +956,6 @@ class volum:
             #####################################################################################
             # pass
 
+            # print self.dlg.both.isChecked()
             print "end" #COMMENT
             
