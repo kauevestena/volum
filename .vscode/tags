@@ -42,8 +42,8 @@ __date__	../test/test_resources.py	/^__date__ = '2017-11-23'$/;"	kind:variable	l
 __date__	../test/test_translations.py	/^__date__ = '12\/10\/2011'$/;"	kind:variable	line:13
 __date__	../test/test_volumator_dialog.py	/^__date__ = '2017-11-23'$/;"	kind:variable	line:12
 __init__	../test/qgis_interface.py	/^    def __init__(self, canvas):$/;"	kind:member	line:42
-__init__	../volumator.py	/^    def __init__(self, iface):$/;"	kind:member	line:278
-__init__	../volumator.py	/^    def __init__(self,feature,h1,h2,h3,op,hCalc):$/;"	kind:member	line:195
+__init__	../volumator.py	/^    def __init__(self, iface):$/;"	kind:member	line:308
+__init__	../volumator.py	/^    def __init__(self,feature,h1,h2,h3,op,hCalc):$/;"	kind:member	line:225
 __init__	../volumator_dialog.py	/^    def __init__(self, parent=None):$/;"	kind:member	line:33
 __init__.py	../__init__.py	1;"	kind:file	line:1
 __init__.py	../test/__init__.py	1;"	kind:file	line:1
@@ -58,35 +58,40 @@ addRasterLayer	../test/qgis_interface.py	/^    def addRasterLayer(self, path, ba
 addToolBar	../test/qgis_interface.py	/^    def addToolBar(self, name):$/;"	kind:member	line:173
 addToolBarIcon	../test/qgis_interface.py	/^    def addToolBarIcon(self, action):$/;"	kind:member	line:157
 addVectorLayer	../test/qgis_interface.py	/^    def addVectorLayer(self, path, base_name, provider_key):$/;"	kind:member	line:125
-add_action	../volumator.py	/^    def add_action($/;"	kind:member	line:389
-add_layer_canvas	../volumator.py	/^    def add_layer_canvas(self,layer):$/;"	kind:member	line:497
-area	../volumator.py	/^    area = 0.0$/;"	kind:variable	line:180
-case	../volumator.py	/^    case = 4$/;"	kind:variable	line:194
+add_action	../volumator.py	/^    def add_action($/;"	kind:member	line:423
+add_layer_canvas	../volumator.py	/^    def add_layer_canvas(self,layer):$/;"	kind:member	line:531
+area	../volumator.py	/^    area = 0.0$/;"	kind:variable	line:210
+case	../volumator.py	/^    case = 4$/;"	kind:variable	line:224
 classFactory	../__init__.py	/^def classFactory(iface):  # pylint: disable=invalid-name$/;"	kind:function	line:27
-column	../volumator.py	/^def column(matrixList, i):$/;"	kind:function	line:69
-computername	../volumator.py	/^computername = "kauevestena"$/;"	kind:variable	line:129
+clearFields	../volumator.py	/^    def clearFields(self):$/;"	kind:member	line:563
+column	../volumator.py	/^def column(matrixList, i):$/;"	kind:function	line:99
+computername	../volumator.py	/^computername = "kauevestena"$/;"	kind:variable	line:159
 conf.py	../help/source/conf.py	1;"	kind:file	line:1
 copyright	../help/source/conf.py	/^copyright = u'2013, Kaue de Moraes Vestena - UFPR'$/;"	kind:variable	line:44
+crossProduct	../volumator.py	/^def crossProduct(p1,p2):$/;"	kind:function	line:64
+crsOrt	../volumator.py	/^crsOrt = QgsCoordinateReferenceSystem()$/;"	kind:variable	line:58
 currentLayerChanged	../test/qgis_interface.py	/^    currentLayerChanged = pyqtSignal(QgsMapCanvasLayer)$/;"	kind:variable	line:40
-define_op	../volumator.py	/^def define_op(MIN,MAX,hcal):$/;"	kind:function	line:103
-dp1	../volumator.py	/^    dp1 = 0.0$/;"	kind:variable	line:192
-dp2	../volumator.py	/^    dp2 = 0.0$/;"	kind:variable	line:193
-euclidean_distance	../volumator.py	/^def euclidean_distance(point1,point2):$/;"	kind:function	line:51
+define_op	../volumator.py	/^def define_op(MIN,MAX,hcal):$/;"	kind:function	line:133
+deleteIfExists	../volumator.py	/^def deleteIfExists(path):$/;"	kind:function	line:53
+dotProduct	../volumator.py	/^def dotProduct(p1,p2):$/;"	kind:function	line:61
+dp1	../volumator.py	/^    dp1 = 0.0$/;"	kind:variable	line:222
+dp2	../volumator.py	/^    dp2 = 0.0$/;"	kind:variable	line:223
+euclidean_distance	../volumator.py	/^def euclidean_distance(point1,point2):$/;"	kind:function	line:81
 exclude_patterns	../help/source/conf.py	/^exclude_patterns = []$/;"	kind:variable	line:67
 extensions	../help/source/conf.py	/^extensions = ['sphinx.ext.todo', 'sphinx.ext.pngmath', 'sphinx.ext.viewcode']$/;"	kind:variable	line:28
-get_areas	../volumator.py	/^def get_areas(layer):$/;"	kind:function	line:79
-get_datetime	../volumator.py	/^def get_datetime():$/;"	kind:function	line:100
+get_areas	../volumator.py	/^def get_areas(layer):$/;"	kind:function	line:109
+get_datetime	../volumator.py	/^def get_datetime():$/;"	kind:function	line:130
 get_qgis_app	../test/utilities.py	/^def get_qgis_app():$/;"	kind:function	line:15
-get_triangles	../volumator.py	/^def get_triangles(layer,H1,H2,H3,op,hCalc):$/;"	kind:function	line:88
+get_triangles	../volumator.py	/^def get_triangles(layer,H1,H2,H3,op,hCalc):$/;"	kind:function	line:118
 hide_password	../plugin_upload.py	/^def hide_password(url, start=6):$/;"	kind:function	line:55
-hmed	../volumator.py	/^    hmed = 0.0$/;"	kind:variable	line:188
+hmed	../volumator.py	/^    hmed = 0.0$/;"	kind:variable	line:218
 html_static_path	../help/source/conf.py	/^html_static_path = ['_static']$/;"	kind:variable	line:123
 html_theme	../help/source/conf.py	/^html_theme = 'default'$/;"	kind:variable	line:94
 htmlhelp_basename	../help/source/conf.py	/^htmlhelp_basename = 'TemplateClassdoc'$/;"	kind:variable	line:167
-initGui	../volumator.py	/^    def initGui(self):$/;"	kind:member	line:465
-interPT1	../volumator.py	/^    interPT1 = None$/;"	kind:variable	line:190
-interPT2	../volumator.py	/^    interPT2 = None$/;"	kind:variable	line:191
-kTriangle	../volumator.py	/^class kTriangle:$/;"	kind:class	line:177
+initGui	../volumator.py	/^    def initGui(self):$/;"	kind:member	line:499
+interPT1	../volumator.py	/^    interPT1 = None$/;"	kind:variable	line:220
+interPT2	../volumator.py	/^    interPT2 = None$/;"	kind:variable	line:221
+kTriangle	../volumator.py	/^class kTriangle:$/;"	kind:class	line:207
 latex_documents	../help/source/conf.py	/^latex_documents = [$/;"	kind:variable	line:180
 legendInterface	../test/qgis_interface.py	/^    def legendInterface(self):$/;"	kind:member	line:203
 main	../plugin_upload.py	/^def main(parameters, arguments):$/;"	kind:function	line:21
@@ -94,13 +99,13 @@ mainWindow	../test/qgis_interface.py	/^    def mainWindow(self):$/;"	kind:member
 man_pages	../help/source/conf.py	/^man_pages = [$/;"	kind:variable	line:213
 mapCanvas	../test/qgis_interface.py	/^    def mapCanvas(self):$/;"	kind:member	line:181
 master_doc	../help/source/conf.py	/^master_doc = 'index'$/;"	kind:variable	line:40
-med3	../volumator.py	/^def med3(v1,v2,v3):$/;"	kind:function	line:141
+med3	../volumator.py	/^def med3(v1,v2,v3):$/;"	kind:function	line:171
 newProject	../test/qgis_interface.py	/^    def newProject(self):$/;"	kind:member	line:102
-obtain_ids	../volumator.py	/^    def obtain_ids(self):$/;"	kind:member	line:517
-obtain_max_min	../volumator.py	/^    def obtain_max_min(self):$/;"	kind:member	line:509
+obtain_ids	../volumator.py	/^    def obtain_ids(self):$/;"	kind:member	line:551
+obtain_max_min	../volumator.py	/^    def obtain_max_min(self):$/;"	kind:member	line:543
 parser	../plugin_upload.py	/^    parser = OptionParser(usage="%prog [options] plugin.zip")$/;"	kind:variable	line:73
 plugin_upload.py	../plugin_upload.py	1;"	kind:file	line:1
-poly	../volumator.py	/^    poly = None$/;"	kind:variable	line:179
+poly	../volumator.py	/^    poly = None$/;"	kind:variable	line:209
 project	../help/source/conf.py	/^project = u'volum'$/;"	kind:variable	line:43
 pygments_style	../help/source/conf.py	/^pygments_style = 'sphinx'$/;"	kind:variable	line:84
 qCleanupResources	../resources.py	/^def qCleanupResources():$/;"	kind:function	line:106
@@ -109,31 +114,31 @@ qgis_interface.py	../test/qgis_interface.py	1;"	kind:file	line:1
 qt_resource_data	../resources.py	/^"$/;"	kind:variable	line:79
 qt_resource_name	../resources.py	/^"$/;"	kind:variable	line:94
 qt_resource_struct	../resources.py	/^"$/;"	kind:variable	line:101
-reg3	../volumator.py	/^def reg3(X1,Y1,X2):$/;"	kind:function	line:144
+reg3	../volumator.py	/^def reg3(X1,Y1,X2):$/;"	kind:function	line:174
 release	../help/source/conf.py	/^release = '0.1'$/;"	kind:variable	line:53
 removeAllLayers	../test/qgis_interface.py	/^    def removeAllLayers(self):$/;"	kind:member	line:98
 removeToolBarIcon	../test/qgis_interface.py	/^    def removeToolBarIcon(self, action):$/;"	kind:member	line:165
 res	../plugin_upload.py	/^        res = raw_input()$/;"	kind:variable	line:99
 resources.py	../resources.py	1;"	kind:file	line:1
-retrieve_att	../volumator.py	/^def retrieve_att(layer,att_id,row_id):$/;"	kind:function	line:55
-retrieve_atts	../volumator.py	/^def retrieve_atts(layer):$/;"	kind:function	line:62
-run	../volumator.py	/^    def run(self):$/;"	kind:member	line:534
+retrieve_att	../volumator.py	/^def retrieve_att(layer,att_id,row_id):$/;"	kind:function	line:85
+retrieve_atts	../volumator.py	/^def retrieve_atts(layer):$/;"	kind:function	line:92
+run	../volumator.py	/^    def run(self):$/;"	kind:member	line:579
 runner	../test/test_resources.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:40
 runner	../test/test_translations.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:54
 runner	../test/test_volumator_dialog.py	/^    runner = unittest.TextTestRunner(verbosity=2)$/;"	kind:variable	line:53
-sameSignal	../volumator.py	/^def sameSignal(v1,v2):$/;"	kind:function	line:147
-select_input_file	../volumator.py	/^    def select_input_file(self):$/;"	kind:member	line:488
-select_output_file	../volumator.py	/^    def select_output_file(self):$/;"	kind:member	line:492
+sameSignal	../volumator.py	/^def sameSignal(v1,v2):$/;"	kind:function	line:177
+select_input_file	../volumator.py	/^    def select_input_file(self):$/;"	kind:member	line:522
+select_output_file	../volumator.py	/^    def select_output_file(self):$/;"	kind:member	line:526
 setUp	../test/test_resources.py	/^    def setUp(self):$/;"	kind:member	line:24
 setUp	../test/test_translations.py	/^    def setUp(self):$/;"	kind:member	line:27
 setUp	../test/test_volumator_dialog.py	/^    def setUp(self):$/;"	kind:member	line:28
-set_orto_crs	../volumator.py	/^    def set_orto_crs(self):$/;"	kind:member	line:503
+set_orto_crs	../volumator.py	/^    def set_orto_crs(self):$/;"	kind:member	line:537
 source_suffix	../help/source/conf.py	/^source_suffix = '.rst'$/;"	kind:variable	line:34
 suite	../test/test_resources.py	/^    suite = unittest.makeSuite(volumResourcesTest)$/;"	kind:variable	line:39
 suite	../test/test_translations.py	/^    suite = unittest.makeSuite(SafeTranslationsTest)$/;"	kind:variable	line:53
 suite	../test/test_volumator_dialog.py	/^    suite = unittest.makeSuite(volumDialogTest)$/;"	kind:variable	line:52
-sum	../volumator.py	/^def sum(lst):$/;"	kind:function	line:72
-sum2abs	../volumator.py	/^def sum2abs(v1,v2):$/;"	kind:function	line:174
+sum	../volumator.py	/^def sum(lst):$/;"	kind:function	line:102
+sum2abs	../volumator.py	/^def sum2abs(v1,v2):$/;"	kind:function	line:204
 tearDown	../test/test_resources.py	/^    def tearDown(self):$/;"	kind:member	line:28
 tearDown	../test/test_translations.py	/^    def tearDown(self):$/;"	kind:member	line:32
 tearDown	../test/test_volumator_dialog.py	/^    def tearDown(self):$/;"	kind:member	line:32
@@ -150,18 +155,20 @@ test_read_init	../test/test_init.py	/^    def test_read_init(self):$/;"	kind:mem
 test_resources.py	../test/test_resources.py	1;"	kind:file	line:1
 test_translations.py	../test/test_translations.py	1;"	kind:file	line:1
 test_volumator_dialog.py	../test/test_volumator_dialog.py	1;"	kind:file	line:1
-tr	../volumator.py	/^    def tr(self, message):$/;"	kind:member	line:374
-triangWKT	../volumator.py	/^    triangWKT = ""$/;"	kind:variable	line:178
-triangleType	../volumator.py	/^def triangleType(diffs):$/;"	kind:function	line:155
-unload	../volumator.py	/^    def unload(self):$/;"	kind:member	line:476
+tetrahedVolum	../volumator.py	/^def tetrahedVolum(A,B,C,D):$/;"	kind:function	line:73
+tr	../volumator.py	/^    def tr(self, message):$/;"	kind:member	line:408
+triangWKT	../volumator.py	/^    triangWKT = ""$/;"	kind:variable	line:208
+triangleType	../volumator.py	/^def triangleType(diffs):$/;"	kind:function	line:185
+tupleDiff	../volumator.py	/^def tupleDiff(p1,p2):$/;"	kind:function	line:70
+unload	../volumator.py	/^    def unload(self):$/;"	kind:member	line:510
 username	../plugin_upload.py	/^        username = getpass.getuser()$/;"	kind:variable	line:97
 utilities.py	../test/utilities.py	1;"	kind:file	line:1
-vH	../volumator.py	/^    vH = 0.0$/;"	kind:variable	line:184
+vH	../volumator.py	/^    vH = 0.0$/;"	kind:variable	line:214
 version	../help/source/conf.py	/^version = '0.1'$/;"	kind:variable	line:51
-vhs	../volumator.py	/^    vhs = []$/;"	kind:variable	line:185
-volAt	../volumator.py	/^    volAt = 0.0$/;"	kind:variable	line:187
-volCt	../volumator.py	/^    volCt = 0.0$/;"	kind:variable	line:186
-volum	../volumator.py	/^class volum:$/;"	kind:class	line:275
+vhs	../volumator.py	/^    vhs = []$/;"	kind:variable	line:215
+volAt	../volumator.py	/^    volAt = 0.0$/;"	kind:variable	line:217
+volCt	../volumator.py	/^    volCt = 0.0$/;"	kind:variable	line:216
+volum	../volumator.py	/^class volum:$/;"	kind:class	line:305
 volumDialog	../volumator_dialog.py	/^class volumDialog(QtGui.QDialog, FORM_CLASS):$/;"	kind:class	line:32
 volumDialogTest	../test/test_resources.py	/^class volumDialogTest(unittest.TestCase):$/;"	kind:class	line:21
 volumDialogTest	../test/test_volumator_dialog.py	/^class volumDialogTest(unittest.TestCase):$/;"	kind:class	line:25

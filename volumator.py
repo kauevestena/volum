@@ -50,6 +50,10 @@ import os.path
 
 # def regTetrahVol()
 
+toDeg = 180/math.pi
+toRad = math.pi/180
+
+
 def deleteIfExists(path):
     if os.path.isfile(path):
         os.remove(path)
@@ -57,6 +61,16 @@ def deleteIfExists(path):
 
 crsOrt = QgsCoordinateReferenceSystem()
 crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
+
+def azimuth2points(A,B):
+    dif = (B[0]-A[0],B[1]-A[1])
+    a = atan2(dif[1],dif[0]) *toDeg
+    az = 90 - a
+    if az < 0:
+        az+=360
+    return az
+
+
 
 def dotProduct(p1,p2):
     return p1[0]*p2[0]+p1[1]*p2[1]
@@ -367,11 +381,12 @@ class volum:
         #botao clear
         self.dlg.clearAll.clicked.connect(self.clearFields)
 
-        ###botao de seleciona CRS #31982
+        ###botao de seleciona CRS #31982 #32614
         temp = QgsCoordinateReferenceSystem()
-        temp.createFromId(31982)
-        # self.dlg.crsSel.setCrs(temp)
-        self.dlg.crsSel.setCrs(crsOrt)
+        # temp.createFromId(31982)
+        temp.createFromId(32614)
+        self.dlg.crsSel.setCrs(temp)
+        # self.dlg.crsSel.setCrs(crsOrt)
 
 
         #muda seletor de CRS caso seja selecionado o orto
@@ -395,7 +410,7 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        self.dlg.input2.setText("/home/"+computername+"/Documents/ex2.csv") #COMMENT
+        self.dlg.input2.setText("/home/"+computername+"/Documents/epsg32614.csv") #COMMENT
         self.dlg.outputTxt.setText("/home/"+computername+"/report.txt") #COMMENT
 
 
@@ -604,7 +619,8 @@ class volum:
             delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau3.shp"  #HITF
             xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
             point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
-            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour2.shp" #HITF
+            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour2017.shp" #HITF
+            contourpath2 = "/home/"+computername+"/.qgis2/processing/outputs/contour4.shp" #HITF
             # outpath = "/home/"+computername+"/report.txt" #HITF
 
             deleteIfExists(delaupath) #CAREFUL
@@ -737,30 +753,74 @@ class volum:
             if op == 3:
                 # poly = []
                 # distList = []
-                contour = QgsVectorLayer("Point","line2","memory")
+                index = 0
+                contour = QgsVectorLayer("LineString","line2","memory")
                 contour.setCrs(self.dlg.crsSel.crs())
+                # contour2.setCrs(self.dlg.crsSel.crs())
                 prov = contour.dataProvider()
-                prov.addAttributes([QgsField("dist", QVariant.Double)])
+                prov.addAttributes([QgsField("id", QVariant.Int)])
+                # writer = QgsVectorFileWriter(contourpath, prov.encoding(), prov.fields(),"LineString", prov.crs())
                 for triang in vec_triangles:
                     if triang.case != 4:
                         f1 = QgsFeature()
-                        f2 = QgsFeature()
-                        f1.setAttributes([triang.dp1])
-                        f2.setAttributes([triang.dp2])
-                        f1.setGeometry(QgsGeometry.fromPoint(triang.interPT1))
-                        f2.setGeometry(QgsGeometry.fromPoint(triang.interPT2))
-                        prov.addFeatures([f1,f2])
+                        # f2 = QgsFeature()
+                        f1.setAttributes([1])
+                        # f2.setAttributes([triang.dp2])
+                        f1.setGeometry(QgsGeometry.fromPolyline([triang.interPT1,triang.interPT2]))
+                        # f1.setGeometry(QgsGeometry.fromPoint(triang.interPT1))
+                        # f2.setGeometry(QgsGeometry.fromPoint(triang.interPT2))
+                        prov.addFeatures([f1])
                         # poly.append(triang.interPT1)
                         # poly.append(triang.interPT2)
                         # distList.append(triang.dp1)
                         # distList.append(triang.dp2)
+                        index += 1
                 # line = QgsGeometry.fromPolyline(poly)
                 # prov = contour.dataProvider()
                 # feat = QgsFeature()
                 # feat.setGeometry(line)
                 # prov.addFeatures([feat])
+
                 contour.updateFields()
                 contour.updateExtents()
+                contour.commitChanges()
+
+                #Geracao da curva de nivel como uma geometria unica
+                #  nao os segmentos separadpos
+
+                processing.runalg("qgis:singlepartstomultipart",contour,"id",contourpath)
+                contour2 = QgsVectorLayer(contourpath,"CalcContour","ogr")
+                feature = contour2.getFeatures().next()
+
+                #gerando os pontos a serem locados
+                interpolatedPoints = QgsVectorLayer("Point","pontosLocac","memory")
+                interpolatedPoints.setCrs(self.dlg.crsSel.crs())
+                prov2 = interpolatedPoints.dataProvider()
+
+                contourLen = feature.geometry().length()
+                accum = 0.0
+                incr = 0.1 #
+                # points = []
+                while (accum < contourLen):
+                    point = feature.geometry().interpolate(accum)
+                    # points.append[point]
+                    P = QgsFeature()
+                    P.setGeometry(point)
+                    accum += incr
+                    prov2.addFeatures([P])
+
+                interpolatedPoints.updateFields()
+                interpolatedPoints.updateExtents()
+                interpolatedPoints.commitChanges()
+
+
+                # line = QgsGeometry.fromPolyline(poly)
+                # prov = contour.dataProvider()
+                # feat = QgsFeature()
+                # feat.setGeometry(line)
+                # prov.addFeatures([feat])
+
+
 
 
 
@@ -858,7 +918,9 @@ class volum:
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
             if op == 3:
-                self.add_layer_canvas(contour)
+                self.add_layer_canvas(contour2)
+                # self.add_layer_canvas(interpolatedPoints)
+                # self.add_layer_canvas(contour)
             # self.add_layer_canvas(xymean)  #COMMENT
 
 
