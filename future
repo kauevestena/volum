@@ -1,0 +1,12 @@
+Simbologia:
+cores padroes para as camadas geradas 
+“rampa de cores” para as altitudes
+Cálculo de Volumes para Planos Inclinados (“rampas”) *
+Cálculo de Volumes para Superfície Arbitrária *
+Inserção de Coluna “Z_PROJ”
+Totalmente Arbitrário (Região de Interseção no plano e projeção vertical de uma na outra )
+Calculo de volumes dividindo os prismas em 4 tetraedros para maior rigor no cálculo (alturas ponderadas possui erro sistemático)
+Transformacao do EPSG selecionado para uma projecao ortografica com origem no topocentro dos dados
+
+adicionar a cada triangulo o valor de corte e o valor de aterro para o mesmo
+podendo gerar graficos, incusive do percentual de volume de corte/aterro para cada um dos triangulos
