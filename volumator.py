@@ -380,7 +380,7 @@ class kTriangle:
                 vvol = vol1 + vol2 + vol3                           
 
 
-                if (vhs[1] > 0):
+                if (vhs[0] > 0):
                     self.volCt += volT1
                     self.volAt += vvol
                 else:
@@ -420,7 +420,7 @@ class kTriangle:
                 vvol = vol1 + vol2 + vol3            
 
 
-                if (vhs[1] > 0):
+                if (vhs[2] > 0):
                     self.volCt += volT1
                     self.volAt += vvol
                 else:
@@ -1052,7 +1052,7 @@ class volum:
                 file.write("Volume de Aterro: "+str(sumAt)+" m3 (metros cubicos)"+nl+nl)
 
 
-                file.write("Area Total: "+str(sumArea)+" m2 (metros quadrados)"+nl+nl+nl)
+                file.write("Area Total no Plano de Projecao: "+str(sumArea)+" m2 (metros quadrados)"+nl+nl+nl)
 
                 file.write("Dados de Entrada: "+nl)
                 file.write("Arquivo de Entrada: "+self.dlg.input2.text()+nl)
