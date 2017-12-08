@@ -23,10 +23,12 @@
 """
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, QLocale
 # import QString
-from PyQt4.QtGui import QAction, QIcon, QFileDialog
+from PyQt4.QtGui import QAction, QIcon, QFileDialog, QColor
 from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
 from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils,QgsExpression
-from qgis.core import QgsField, QgsGeometry, QgsFeature
+from qgis.core import QgsField, QgsGeometry, QgsFeature, QgsColorRampShader, QgsSymbolV2, QgsRendererRangeV2
+from qgis.core import QgsGraduatedSymbolRendererV2
+# from qgis.core import *
 from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
 from qgis.utils import iface
 # Initialize Qt resources from file resources.py
@@ -54,8 +56,8 @@ toDeg = 180/math.pi
 toRad = math.pi/180
 
 def gdec2gms(gdec):
-    g = floor(abs(gdec))
-    m = floor((abs(gdec)-g)*60)
+    g = math.floor(abs(gdec))
+    m = math.floor((abs(gdec)-g)*60)
     s = (((abs(gdec)-g)*60)-m)*60
     if gdec < 0.0:
         g = -g
@@ -73,7 +75,7 @@ crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
 
 def azimuth2points(A,B):
     dif = (B[0]-A[0],B[1]-A[1])
-    a = atan2(dif[1],dif[0]) *toDeg
+    a = math.atan2(dif[1],dif[0]) *toDeg
     az = 90 - a
     if az < 0:
         az+=360
@@ -85,9 +87,9 @@ def dotProduct(p1,p2):
     return p1[0]*p2[0]+p1[1]*p2[1]
 
 def crossProduct(p1,p2):
-    x = p1[2]*p2[3]-p1[3]*p2[2]
-    y = p1[3]*p2[1]-p1[1]*p2[3]
-    z = p1[1]*p2[2]-p1[2]*p2[1]
+    x = p1[1]*p2[2]-p1[2]*p2[1]
+    y = p1[2]*p2[0]-p1[0]*p2[2]
+    z = p1[0]*p2[1]-p1[1]*p2[0]
     return (x,y,z)
 
 def tupleDiff(p1,p2):
@@ -194,8 +196,8 @@ def define_op(MIN,MAX,hcal):
 
 
 
-# computername = "kaue2"
-computername = "kauevestena"
+computername = "kaue2"
+# computername = "kauevestena"
 #HITF = Handle In The Future
 
 print "teste "+get_datetime() #COMMENT
@@ -206,12 +208,24 @@ print "teste "+get_datetime() #COMMENT
 #         self.y = y
 #         self.z = z 
 
+def float2str(val):
+    return str("{:.3f}".format(val))
+
+
 def TupleAsString(TUP):
     res = ""
     for element in TUP:
         res += str(element)
         res += " "
     return res
+
+def TupleAsString2(TUP):
+    res = ""
+    for element in TUP:
+        res += str(int(element))
+        res += " "
+    return res
+
 
 def med3(v1,v2,v3):
     return (v1+v2+v3)/3
@@ -230,9 +244,9 @@ def sameSignal(v1,v2):
 def triangleType(diffs):
     #to define in wich segments the point will
     # need to be interpolated
-    #case 1: 1 2,2 3
-    #case 2: 1 2,3 1
-    #case 3: 2 3,3 1
+    #case 1: 1 2,2 3 tetraedro em 2
+    #case 2: 1 2,3 1 tetraedro em 1
+    #case 3: 2 3,3 1 tetraedro em 3
     c12 = not sameSignal(diffs[0],diffs[1])
     c23 = not sameSignal(diffs[1],diffs[2])
     c31 = not sameSignal(diffs[2],diffs[0])
@@ -308,8 +322,32 @@ class kTriangle:
                 self.interPT2 = l23.interpolate(ditp23).asPoint()
                 self.dp1 = ditp12
                 self.dp2 = ditp23
-                self.volAt += 0.0
-                self.volCt += 0.0
+
+                #pontos do tetraedro e volume
+                itp13d = (self.interPT1[0],self.interPT1[1],hCalc)
+                itp23d = (self.interPT2[0],self.interPT2[1],hCalc)
+                p2virt = (self.poly[0][1][0],self.poly[0][1][1],hCalc)
+                p23d   = (self.poly[0][1][0],self.poly[0][1][1],self.h2)
+                volT1 = tetrahedVolum(itp13d,itp23d,p2virt,p23d)
+
+                #pontos extras para o prisma triangular
+                p1virt = (self.poly[0][0][0],self.poly[0][0][1],hCalc)
+                p13d   = (self.poly[0][0][0],self.poly[0][0][1],self.h1)
+                p3virt = (self.poly[0][2][0],self.poly[0][2][1],hCalc)
+                p33d   = (self.poly[0][2][0],self.poly[0][2][1],self.h3)
+
+                vol1 = tetrahedVolum(itp13d,itp23d,p3virt,p33d)
+                vol2 = tetrahedVolum(p13d,p33d,p3virt,itp23d)
+                vol3 = tetrahedVolum(p13d,p1virt,p3virt,itp13d)
+                vvol = vol1 + vol2 + vol3              
+
+                if (vhs[1] > 0):
+                    self.volCt += volT1
+                    self.volAt += vvol
+                else:
+                    self.volAt += volT1
+                    self.volCt += vvol
+
             elif self.case == 2:
                 v12 = sum2abs(vhs[0],vhs[1])
                 v31 = sum2abs(vhs[0],vhs[2])
@@ -321,8 +359,36 @@ class kTriangle:
                 self.interPT2 = l31.interpolate(ditp31).asPoint()
                 self.dp1 = ditp12
                 self.dp2 = ditp31
-                self.volAt += 0.0
-                self.volCt += 0.0
+
+                #pontos do tetraedro e volume
+                itp12d = (self.interPT1[0],self.interPT1[1],hCalc)
+                itp31d = (self.interPT2[0],self.interPT2[1],hCalc)
+                p1virt = (self.poly[0][0][0],self.poly[0][0][1],hCalc)
+                p13d   = (self.poly[0][0][0],self.poly[0][0][1],self.h1)
+                volT1 = tetrahedVolum(itp12d,itp31d,p1virt,p13d)
+
+                #pontos extras para o prisma triangular
+                p3virt = (self.poly[0][2][0],self.poly[0][2][1],hCalc)
+                p33d   = (self.poly[0][2][0],self.poly[0][2][1],self.h3)
+                p2virt = (self.poly[0][1][0],self.poly[0][1][1],hCalc)
+                p23d   = (self.poly[0][1][0],self.poly[0][1][1],self.h2)
+
+                # print [itp12d,itp31d,p2virt,p23d]
+                vol1 = tetrahedVolum(itp12d,itp31d,p2virt,p23d)
+                vol2 = tetrahedVolum(p33d,p23d,p2virt,itp31d)
+                vol3 = tetrahedVolum(p33d,p3virt,p2virt,itp12d)
+                vvol = vol1 + vol2 + vol3                           
+
+
+                if (vhs[1] > 0):
+                    self.volCt += volT1
+                    self.volAt += vvol
+                else:
+                    self.volAt += volT1
+                    self.volCt += vvol
+
+
+
             elif self.case == 3:
                 v23 = sum2abs(vhs[1],vhs[2])
                 v31 = sum2abs(vhs[0],vhs[2])
@@ -334,8 +400,33 @@ class kTriangle:
                 self.interPT2 = l31.interpolate(ditp31).asPoint()
                 self.dp1 = ditp23
                 self.dp2 = ditp31
-                self.volAt += 0.0
-                self.volCt += 0.0
+
+                #pontos do tetraedro e volume
+                itp23d = (self.interPT1[0],self.interPT1[1],hCalc)
+                itp31d = (self.interPT2[0],self.interPT2[1],hCalc)
+                p3virt = (self.poly[0][2][0],self.poly[0][2][1],hCalc)
+                p33d   = (self.poly[0][2][0],self.poly[0][2][1],self.h1)
+                volT1 = tetrahedVolum(itp23d,itp31d,p3virt,p33d)
+
+                #pontos extras para o prisma triangular
+                p1virt = (self.poly[0][0][0],self.poly[0][0][1],hCalc)
+                p13d   = (self.poly[0][0][0],self.poly[0][0][1],self.h1)
+                p2virt = (self.poly[0][1][0],self.poly[0][1][1],hCalc)
+                p23d   = (self.poly[0][1][0],self.poly[0][1][1],self.h2)
+
+                vol1 = tetrahedVolum(itp23d,itp31d,p2virt,p23d)
+                vol2 = tetrahedVolum(p13d,p23d,p2virt,itp31d)
+                vol3 = tetrahedVolum(p13d,p1virt,p2virt,itp23d)
+                vvol = vol1 + vol2 + vol3            
+
+
+                if (vhs[1] > 0):
+                    self.volCt += volT1
+                    self.volAt += vvol
+                else:
+                    self.volAt += volT1
+                    self.volCt += vvol
+
 
     # def convToListOfQstring(list):
     #     out = []
@@ -432,6 +523,8 @@ class volum:
         #trocando virgula (argh) por ponto
         self.dlg.hCalc.setLocale(QLocale("UnitedStates")) #LANGUAGE
         self.dlg.hEquip.setLocale(QLocale("UnitedStates")) #LANGUAGE
+        self.dlg.hBast.setLocale(QLocale("UnitedStates")) #LANGUAGE
+        self.dlg.espac.setLocale(QLocale("UnitedStates")) #LANGUAGE
         self.dlg.hEquip.setValue(1.5)
 
         #hiding everithing that is not useful at the beggining #DO
@@ -794,7 +887,7 @@ class volum:
             if op == 3:
                 # poly = []
                 # distList = []
-                index = 0
+                # index = 0
                 contour = QgsVectorLayer("LineString","line2","memory")
                 contour.setCrs(self.dlg.crsSel.crs())
                 # contour2.setCrs(self.dlg.crsSel.crs())
@@ -815,7 +908,7 @@ class volum:
                         # poly.append(triang.interPT2)
                         # distList.append(triang.dp1)
                         # distList.append(triang.dp2)
-                        index += 1
+                        # index += 1
                 # line = QgsGeometry.fromPolyline(poly)
                 # prov = contour.dataProvider()
                 # feat = QgsFeature()
@@ -831,6 +924,7 @@ class volum:
 
                 processing.runalg("qgis:singlepartstomultipart",contour,"id",contourpath)
                 contour2 = QgsVectorLayer(contourpath,"CalcContour","ogr")
+                self.add_layer_canvas(contour)
                 feature = contour2.getFeatures().next()
 
                 #gerando os pontos a serem locados
@@ -844,7 +938,7 @@ class volum:
                 points = []
                 while (accum < contourLen):
                     point = feature.geometry().interpolate(accum)
-                    points.append[point.asPoint()]
+                    points.append(point.asPoint())
                     P = QgsFeature()
                     P.setGeometry(point)
                     accum += incr
@@ -889,9 +983,25 @@ class volum:
                         Est = (pEst[0],pEst[1],zEst)
                         Ori = (pOri[0],pOri[1],zOri)
 
+                        dhEO = euclideanDistanceTuple2D(Est,Ori)
+                        diEO = euclideanDistanceTuple3D(Est,Ori)
+
                         aZpart = azimuth2points(Est,Ori)
 
+                        angZEO = gdec2gms(azimuth2points((0,0),(dhEO,Ori[2]-Est[2])))
+
                         data=[]
+
+                        locLines = QgsVectorLayer("LineString","locLines","memory")
+                        locLines.setCrs(self.dlg.crsSel.crs())
+                        prov3 = locLines.dataProvider()
+                        prov3.addAttributes([QgsField("Tipo", QVariant.String)])
+
+                        f1 = QgsFeature()
+                        f1.setAttributes(["Referencia"])
+                        f1.setGeometry(QgsGeometry.fromPolyline([pEst,pOri]))
+                        prov3.addFeatures([f1])
+
 
                         for ppoint in points:
                             P3D = (ppoint[0],ppoint[1],hcal)
@@ -905,7 +1015,14 @@ class volum:
                             angZ =  gdec2gms(angZdec)
                             pointData = [angH,angZ,DI,DH]
                             data.append(pointData)
+                            f1 = QgsFeature()
+                            f1.setAttributes(["Ponto Na Curva"])
+                            f1.setGeometry(QgsGeometry.fromPolyline([pEst,ppoint]))
+                            prov3.addFeatures([f1])                            
 
+                        locLines.updateFields()
+                        locLines.updateExtents()
+                        locLines.commitChanges()
                     
 
 
@@ -914,9 +1031,11 @@ class volum:
 
             # # #Relatorio de saida
             if self.dlg.outputTxt.text()  != "":
+                nl = "\n"
+
                 file = open(self.dlg.outputTxt.text(),"w")
-                file.write("############## ~~VOLUMATOR 0.1 ~~ ##############\n")
-                file.write("        Relatorio de Saida do Processamento\n\n")
+                file.write("########################### ~~VOLUMATOR 0.1 ~~ ###########################"+nl)
+                file.write("                   Relatorio de Saida do Processamento"+nl+nl+nl)
 
                 sumCt = 0.0
                 sumAt = 0.0
@@ -928,7 +1047,6 @@ class volum:
                     sumArea += tri.area
                     # print tri.area
 
-                nl = "\n"
 
                 file.write("Volume de Corte: " +str(sumCt)+" m3 (metros cubicos)"+nl)
                 file.write("Volume de Aterro: "+str(sumAt)+" m3 (metros cubicos)"+nl+nl)
@@ -943,30 +1061,41 @@ class volum:
                 file.write("Altura Min. "+str(MIN)+nl)
                 if hcal < MIN and sumArea != 0:
                     file.write("Altura de passagem (mesmo volume de Corte e Aterro): "+str(hcal+(sumCt/sumArea))+nl+nl)
-                    pass
+                    pass    
 
                 if planCalculated:
                     file.write("Planilha de Locação da Curva com a Altitude de Calculo: "+nl)
+                    file.write("Considerado o Angulo Horario, Zerando no ponto utilizado para Orientacao"+nl)
                     file.write("Espaçamento Escolhido: "+str(self.dlg.espac.value())+nl)
                     if self.dlg.both.isChecked() or self.dlg.trid.isChecked():
-                        file.write("Altura Para o Equipamento: "+self.dlg.hEquip.currentText()+", ")
-                        file.write("Altura Para o Bastao: "+self.dlg.hBast.currentText()+nl)
+                        file.write("Altura Para o Equipamento: "+str(self.dlg.hEquip.value())+", ")
+                        file.write("Altura Para o Bastao: "+str(self.dlg.hBast.value())+nl)
                     file.write("Ponto Escolhido como Estacao: "+self.dlg.stationSelec.currentText()+nl)
                     file.write("de Coordenadas: "+TupleAsString(Est)+nl)
                     file.write("Ponto Escolhido para Orientacao (\"Re\"): "+self.dlg.oriSelec.currentText()+nl)
                     file.write("de Coordenadas: "+TupleAsString(Ori)+nl)
-                    file.write(""+nl+nl)
+                    file.write("Distancia no Plano (\"Horizontal\"): "+ str(dhEO)+nl)
+                    if self.dlg.both.isChecked() or self.dlg.trid.isChecked():
+                        file.write("Distancia Espacial (\"Inclinada\"): " + str(diEO)+nl)
+                        file.write("Angulo Zenital: "+TupleAsString(angZEO)+nl+nl)
+                    # file.write(""+nl+nl)
+                    if self.dlg.both.isChecked():
+                        file.write("Hg Hm Hs Vg Vm Vs DI DH"+nl)
+                    elif self.dlg.plan.isChecked():
+                        file.write("Hg Hm Hs DH"+nl)
+                    elif self.dlg.trid.isChecked():
+                        file.write("Hg Hm Hs Vg Vm Vs DI"+nl)
                     for entry in data:
                         if self.dlg.both.isChecked():
-                            pass
+                            file.write(TupleAsString2(entry[0])+TupleAsString2(entry[1])+float2str(entry[2])+" "+float2str(entry[3])+nl)
                         elif self.dlg.plan.isChecked():
-                            pass
+                            file.write(TupleAsString2(entry[0])+float2str(entry[3])+nl)
                         elif self.dlg.trid.isChecked():
-                            pass
+                            file.write(TupleAsString2(entry[0])+TupleAsString2(entry[1])+float2str(entry[2])+nl+nl)
 
                 
-                file.write(nl+"Criado por Kauê de Moraes Vestena (2017), Programa em Fase de Testes")
-                file.write("######################################## ~~ ##################################")
+                file.write(nl+"Criado por Kauê de Moraes Vestena (2017), Programa em Fase de Testes"+nl)
+                file.write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
                 file.close()
             # # ####
 
@@ -975,6 +1104,26 @@ class volum:
             ### projeto com o CRS escolhido
             iface.mapCanvas().mapRenderer().setDestinationCrs(self.dlg.crsSel.crs())
 
+
+            #Modificando Estilos
+            # pColors = QgsColorRampShader(0.0,255.0)
+            # myMin = 50.1
+            # myMax = 100
+            # myRangeList = []
+            # myOpacity = 1
+            # myLabel = 'Group 2'
+            # myColour = QColor('#00eeff')
+            # mySymbol2 = QgsSymbolV2.defaultSymbol(datapoints.geometryType())
+            # mySymbol2.setColor(myColour)
+            # mySymbol2.setAlpha(myOpacity)
+            # myRange2 = QgsRendererRangeV2(myMin, myMax, mySymbol2, myLabel)
+            # myRangeList.append(myRange2)
+            # myRenderer = QgsGraduatedSymbolRendererV2('', myRangeList)
+            # myRenderer.setMode(QgsGraduatedSymbolRendererV2.EqualInterval)
+            # myRenderer.setClassAttribute("Z")
+            # datapoints.setRendererV2(myRenderer)
+
+
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
@@ -982,7 +1131,8 @@ class volum:
                 self.add_layer_canvas(contour2)
                 
                 if planCalculated:
-                    pass #layer com linhas de locacao
+                    self.add_layer_canvas(locLines)
+                    # pass #layer com linhas de locacao
                 # self.add_layer_canvas(interpolatedPoints)
                 # self.add_layer_canvas(contour)
             # self.add_layer_canvas(xymean)  #COMMENT
