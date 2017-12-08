@@ -53,6 +53,15 @@ import os.path
 toDeg = 180/math.pi
 toRad = math.pi/180
 
+def gdec2gms(gdec):
+    g = floor(abs(gdec))
+    m = floor((abs(gdec)-g)*60)
+    s = (((abs(gdec)-g)*60)-m)*60
+    if gdec < 0.0:
+        g = -g
+        m = -m
+        s = -s
+    return (g,m,s)
 
 def deleteIfExists(path):
     if os.path.isfile(path):
@@ -84,6 +93,9 @@ def crossProduct(p1,p2):
 def tupleDiff(p1,p2):
     return (p1[0]-p2[0],p1[1]-p2[1],p1[2]-p2[2])
 
+# def tupleDiff2(A,B)
+#     return(B)
+
 def tetrahedVolum(A,B,C,D):
     D1 = tupleDiff(A,D)
     D2 = tupleDiff(B,D)
@@ -95,6 +107,19 @@ def tetrahedVolum(A,B,C,D):
 def euclidean_distance(point1,point2):
 # thx: https://gis.stackexchange.com/a/94215
     return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
+
+def euclideanDistanceTuple3D(t1,t2):
+    return math.sqrt((t1[0]-t2[0])**2+(t1[1]-t2[1])**2+(t1[2]-t2[2])**2)
+
+def euclideanDistanceTuple2D(t1,t2):
+    return math.sqrt((t1[0]-t2[0])**2+(t1[1]-t2[1])**2)
+
+def angleFromAz(az1,az2):
+    a = az1 - az2
+    if a < 0:
+        a += 360
+    return a
+
 
 def retrieve_att(layer,att_id,row_id):
     iterr = layer.getFeatures()
@@ -181,6 +206,12 @@ print "teste "+get_datetime() #COMMENT
 #         self.y = y
 #         self.z = z 
 
+def TupleAsString(TUP):
+    res = ""
+    for element in TUP:
+        res += str(element)
+        res += " "
+    return res
 
 def med3(v1,v2,v3):
     return (v1+v2+v3)/3
@@ -361,8 +392,8 @@ class volum:
         self.dlg.hCalc.setMaximum(100000.0)
         self.dlg.espac.setMinimum(0.1)
 
-        #botao "3D"
-        self.dlg.trid.setChecked(True)
+        #botao "BOTH"
+        self.dlg.both.setChecked(True)
 
         # self.dlg.lineEdit.clear()
         # self.dlg.pushButton.clicked.connect(self.select_output_file)
@@ -585,6 +616,7 @@ class volum:
         self.dlg.lMIN.setText("-")
         self.dlg.hCalc.setValue(0.00)
         self.dlg.hEquip.setValue(0.00)
+        self.dlg.hBast.setValue(0.00)
         self.dlg.calcLoc.setChecked(False)
         self.dlg.oriSelec.clear()
         self.dlg.stationSelec.clear()
@@ -714,7 +746,8 @@ class volum:
             MAX = max(column(retrieve_atts(datapoints),3))
 
             ## DEFINIÇÃO DA ALTITUDE DE CALCULO
-            hcal = float(self.dlg.hCalc.text())
+            # hcal = float(self.dlg.hCalc.text())
+            hcal = self.dlg.hCalc.value()
 
             ## booleanos para apenas corte ou aterro
 
@@ -757,6 +790,7 @@ class volum:
             # print [vec_triangles[0].interPT1[0],vec_triangles[0].interPT1[1]]
             
             #geracao da polilinha da curva, quando aplicavel
+            planCalculated = False
             if op == 3:
                 # poly = []
                 # distList = []
@@ -806,11 +840,11 @@ class volum:
 
                 contourLen = feature.geometry().length()
                 accum = 0.0
-                incr = 0.1 #
-                # points = []
+                incr = self.dlg.espac.value() #
+                points = []
                 while (accum < contourLen):
                     point = feature.geometry().interpolate(accum)
-                    # points.append[point]
+                    points.append[point.asPoint()]
                     P = QgsFeature()
                     P.setGeometry(point)
                     accum += incr
@@ -827,73 +861,50 @@ class volum:
                 # feat.setGeometry(line)
                 # prov.addFeatures([feat])
 
-
-
-
-
-                
-
-
-
             
-            # Adicionando as altitudes aos triangulos, area e demais calculos
+                print "pass1" #COMMENT
+                #### Calculos e geração dos dados para a planilha de locacao
+                if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
+                    if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
+                        planCalculated = True
 
-            # # # # # # # triangles.beginEditCommand("Attribute")
-            # # # # # # # # triangles.addAttribute(QgsField("hP1",QVariant.Double))
-            # # # # # # # triangles.dataProvider().addAttributes([QgsField("hP1",QVariant.Double),QgsField("hP2",QVariant.Double),QgsField("hP3",QVariant.Double)])
+                        expEst = QgsExpression("ID = '"+self.dlg.stationSelec.currentText()+"'")
+                        expOri = QgsExpression("ID = '"+self.dlg.oriSelec.currentText()+"'")
 
-            # # # # # # # provider = triangles.dataProvider()
+                        reqEst = QgsFeatureRequest(expEst)
+                        reqOri = QgsFeatureRequest(expOri)
 
-            # # # # # # # areas = [ feat.geometry().area() 
-            # # # # # # #         for feat in triangles.getFeatures() ]
+                        itEst = datapoints.getFeatures(reqEst)
+                        itOri = datapoints.getFeatures(reqOri)
 
-            # # # # # # # field = QgsField("area", QVariant.Double)
-            # # # # # # # provider.addAttributes([field])
-            # # # # # # # triangles.updateFields()
+                        featEst = itEst.next()
+                        featOri = itOri.next()
 
-            # # # # # # # idx = triangles.fieldNameIndex('area')
+                        pEst = featEst.geometry().asPoint()
+                        pOri = featOri.geometry().asPoint()
 
-            # # # # # # # for area in areas:
-            # # # # # # #     new_values = {idx : float(area)}
-            # # # # # # #     provider.changeAttributeValues({areas.index(area):new_values})
+                        zEst = featEst[3] + self.dlg.hEquip.value()
+                        zOri = featOri[3] + self.dlg.hBast.value()
 
-            # # # # # # # idx2 = triangles.fieldNameIndex('hP1')
-            
+                        Est = (pEst[0],pEst[1],zEst)
+                        Ori = (pOri[0],pOri[1],zOri)
 
-            # # # # # # # triangles.endEditCommand()
+                        aZpart = azimuth2points(Est,Ori)
 
-            # # # # # # # triangles.updateFields()
-            
-            print "pass1" #COMMENT
-            #### Calculos e geração dos dados para a planilha de locacao
-            if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
-                if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
-                    expEst = QgsExpression("ID = '"+self.dlg.stationSelec.currentText()+"'")
-                    expOri = QgsExpression("ID = '"+self.dlg.oriSelec.currentText()+"'")
+                        data=[]
 
-                    reqEst = QgsFeatureRequest(expEst)
-                    reqOri = QgsFeatureRequest(expOri)
-
-                    itEst = datapoints.getFeatures(reqEst)
-                    itOri = datapoints.getFeatures(reqOri)
-
-                    featEst = itEst.next()
-                    featOri = itOri.next()
-
-                    Est = featEst.geometry().asPoint()
-                    Ori = featOri.geometry().asPoint()
-
-                    zEst = featEst[3]
-                    zOri = featOri[3]
-
-                    Est = (Est[0],Est[1],zEst)
-                    Ori = (Ori[0],Ori[1],zOri)
-
-                    print Est
-                    print Ori
-
-            
-
+                        for ppoint in points:
+                            P3D = (ppoint[0],ppoint[1],hcal)
+                            DI = euclideanDistanceTuple3D(Est,P3D)
+                            DH = euclideanDistanceTuple3D(Est,P3D)
+                            AzVante = azimuth2points(Est,P3D)
+                            angHdec = angleFromAz(aZpart,AzVante)
+                            vZ = P3D[2] - Est[2]
+                            angZdec = azimuth2points((0,0),(DH,vZ))
+                            angH = gdec2gms(angHdec)
+                            angZ =  gdec2gms(angZdec)
+                            pointData = [angH,angZ,DI,DH]
+                            data.append(pointData)
 
                     
 
@@ -931,10 +942,31 @@ class volum:
                 file.write("Altura Max. "+str(MAX)+nl)
                 file.write("Altura Min. "+str(MIN)+nl)
                 if hcal < MIN and sumArea != 0:
-                    file.write("Altura de passagem (mesmo volume de Corte e Aterro): "+str(hcal+(sumCt/sumArea))+nl)
+                    file.write("Altura de passagem (mesmo volume de Corte e Aterro): "+str(hcal+(sumCt/sumArea))+nl+nl)
                     pass
 
+                if planCalculated:
+                    file.write("Planilha de Locação da Curva com a Altitude de Calculo: "+nl)
+                    file.write("Espaçamento Escolhido: "+str(self.dlg.espac.value())+nl)
+                    if self.dlg.both.isChecked() or self.dlg.trid.isChecked():
+                        file.write("Altura Para o Equipamento: "+self.dlg.hEquip.currentText()+", ")
+                        file.write("Altura Para o Bastao: "+self.dlg.hBast.currentText()+nl)
+                    file.write("Ponto Escolhido como Estacao: "+self.dlg.stationSelec.currentText()+nl)
+                    file.write("de Coordenadas: "+TupleAsString(Est)+nl)
+                    file.write("Ponto Escolhido para Orientacao (\"Re\"): "+self.dlg.oriSelec.currentText()+nl)
+                    file.write("de Coordenadas: "+TupleAsString(Ori)+nl)
+                    file.write(""+nl+nl)
+                    for entry in data:
+                        if self.dlg.both.isChecked():
+                            pass
+                        elif self.dlg.plan.isChecked():
+                            pass
+                        elif self.dlg.trid.isChecked():
+                            pass
 
+                
+                file.write(nl+"Criado por Kauê de Moraes Vestena (2017), Programa em Fase de Testes")
+                file.write("######################################## ~~ ##################################")
                 file.close()
             # # ####
 
@@ -948,6 +980,9 @@ class volum:
             self.add_layer_canvas(datapoints)
             if op == 3:
                 self.add_layer_canvas(contour2)
+                
+                if planCalculated:
+                    pass #layer com linhas de locacao
                 # self.add_layer_canvas(interpolatedPoints)
                 # self.add_layer_canvas(contour)
             # self.add_layer_canvas(xymean)  #COMMENT

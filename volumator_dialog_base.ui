@@ -345,8 +345,8 @@
   <widget class="QDoubleSpinBox" name="hEquip">
    <property name="geometry">
     <rect>
-     <x>750</x>
-     <y>230</y>
+     <x>610</x>
+     <y>220</y>
      <width>101</width>
      <height>31</height>
     </rect>
@@ -419,8 +419,8 @@
   <widget class="QPushButton" name="obIDs">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>200</y>
+     <x>370</x>
+     <y>240</y>
      <width>101</width>
      <height>20</height>
     </rect>
@@ -478,8 +478,8 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>700</x>
-     <y>200</y>
+     <x>550</x>
+     <y>190</y>
      <width>191</width>
      <height>21</height>
     </rect>
@@ -491,7 +491,39 @@
     </font>
    </property>
    <property name="text">
-    <string>Altura Instalacao Equip (m):</string>
+    <string>Alt. Inst. Equip. (m):</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="hBast">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>220</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_12">
+   <property name="geometry">
+    <rect>
+     <x>720</x>
+     <y>190</y>
+     <width>191</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Alt. do Bastao (m):</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
