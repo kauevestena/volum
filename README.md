@@ -1,5 +1,5 @@
 # volumator
-Repositorio do Plugin para calculo de volumes para um conjunto esparso de dados
+Repositorio do Plugin para QGIS de calculo de volumes para um conjunto esparso de dados
 
 Há uma boa quantidade de ferramentas para calculo de Volumes em Estruturas Raster, geralmente voltadas para levantamentos em grande ou média escala
 
@@ -31,8 +31,9 @@ Com esses Exatos 4 campos, sendo um ID dado pelo usuario e as coordenadas do pon
 
 Há um campo para seleção do CRS dos dados, com a opção do CRS ortografico, que possui a métrica de um plano topográfico, caso o Topocentro seja o ponto de tangencia e a extensao nao exceda ~30 Km a partir deste
 
-O calculo é feito com base em uma altitude fornecida no campo de entrada correto
+O calculo é feito com base em uma altitude fornecida no campo de entrada disponível na janela do plugin
 
 Há um botao para obter os valores máximo e mínimo de Altitude (ou "cota"), uma vez que acima do primeiro se terá apenas volume de aterro e abaixo do minímo se terá apenas volume de corte.
 
-Para qualquer altitude intermediária, será gerada a curva de nivel desta, havendo a possibilidade de gerar a planilha de locação de tal curva, no intervalo especificado 
+Para qualquer altitude intermediária, será gerada a curva de nivel desta, havendo a possibilidade de gerar a planilha de locação de tal curva, no intervalo especificado. Caso o ID de um dos pontos contenha: "EST","est","Est", tal ponto será automaticamente selecionado como ponto para instalacao. O mesmo vale para "ORI","ori","Ori","RE","Re","re", que sera automaticamente selecionado como ponto para orientação.
+ 

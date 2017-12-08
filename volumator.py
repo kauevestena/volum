@@ -1147,6 +1147,9 @@ class volum:
             # myRenderer.setClassAttribute("Z")
             # datapoints.setRendererV2(myRenderer)
 
+            # props = triangles.rendererV2().symbol().symbolLayer(0).properties()
+            # props['color'] = 'yellow'
+
 
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
