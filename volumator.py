@@ -696,11 +696,35 @@ class volum:
             layer = QgsVectorLayer(path, "pontosTemp", "delimitedtext")
             idList = column(retrieve_atts(layer),0)
             idList2 = []
+            stacIndex = -1 
+            oriIndex  = -1
+            idx = 0
             for val in idList:
                 idList2.append(str(val))
+                if str(val).find("EST") != -1:
+                    stacIndex = idx
+                elif str(val).find("est") != -1:
+                    stacIndex = idx
+                elif str(val).find("Est") != -1:
+                    stacIndex = idx
+                elif str(val).find("ORI") != -1:
+                    oriIndex = idx
+                elif str(val).find("Ori") != -1:
+                    oriIndex = idx
+                elif str(val).find("RE") != -1:
+                    oriIndex = idx
+                elif str(val).find("Re") != -1:
+                    oriIndex = idx
+                elif str(val).find("re") != -1:
+                    oriIndex = idx
+                idx += 1                                        
             self.dlg.oriSelec.addItems(idList2)
             self.dlg.stationSelec.addItems(idList2)
             layer = None
+            if stacIndex != -1:
+                self.dlg.stationSelec.setCurrentIndex(stacIndex)
+            if oriIndex != -1:
+                self.dlg.oriSelec.setCurrentIndex(oriIndex)
 
     def clearFields(self):
         self.dlg.input2.setText("")
@@ -752,13 +776,13 @@ class volum:
             xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
             point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
             contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour2017.shp" #HITF
-            contourpath2 = "/home/"+computername+"/.qgis2/processing/outputs/contour4.shp" #HITF
+            # contourpath2 = "/home/"+computername+"/.qgis2/processing/outputs/contour4.shp" #HITF
             # outpath = "/home/"+computername+"/report.txt" #HITF
 
             deleteIfExists(delaupath) #CAREFUL
             # deleteIfExists(xymeanpath)
             # deleteIfExists(point2spath)
-            # deleteIfExists(contourpath)
+            deleteIfExists(contourpath)
             
             ###PATHS
 
