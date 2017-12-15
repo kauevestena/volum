@@ -16,8 +16,8 @@ email=kauemv2@gmail.com
 
 about=A maioria das ferramentas livres para cálculo de volumes é voltada para o cálculo em dados raster, para projetos de grande escala. O Volumator se destina a realizar tais cálculos para um conjunto de pontos esparsos contidos em um simples arquivo .csv contendo as coordenadas XYZ dos pontos, estando ou não os dados georreferenciados.
 
-tracker=https://github.com/kauevestena/volumator
-repository=https://github.com/kauevestena/volumator
+tracker=https://github.com/kauevestena/volum/issues
+repository=https://github.com/kauevestena/volum
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=https://github.com/kauevestena/volumator
 # Tags are comma separated with spaces allowed
 tags=volume vector points
 
-homepage=https://github.com/kauevestena/volumator
+homepage=https://github.com/kauevestena/volum
 category=Plugins
 icon=icon.png
 # experimental flag
