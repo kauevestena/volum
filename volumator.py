@@ -478,7 +478,7 @@ class volum:
         self.toolbar = self.iface.addToolBar(u'volum')
         self.toolbar.setObjectName(u'volum')
        
-       #####################################################################
+       ##################################################################### INIT
 
         self.dlg.hCalc.setMaximum(100000.0)
         self.dlg.espac.setMinimum(0.1)
@@ -727,6 +727,7 @@ class volum:
                 self.dlg.oriSelec.setCurrentIndex(oriIndex)
 
     def clearFields(self):
+        #limpar todas os campos
         self.dlg.input2.setText("")
         self.dlg.outputTxt.setText("")
         self.dlg.lMAX.setText("-")
@@ -873,6 +874,9 @@ class volum:
             heigths = column(retrieve_atts(datapoints),3)
 
             # print heigths
+
+            #defining the global option
+            op = define_op(MIN,MAX,hcal)
             
             iP1 = column(retrieve_atts(triangles),0)
             iP2 = column(retrieve_atts(triangles),1)
@@ -891,7 +895,7 @@ class volum:
             for ind in iP3:
                 Hp3.append(heigths[int(ind)])
 
-            op = define_op(MIN,MAX,hcal)
+
             
             # print [len(Hp1),len(Hp2),len(Hp3),len(iP1),len(heigths)] #COMMENT
 
@@ -984,6 +988,7 @@ class volum:
                 #### Calculos e geração dos dados para a planilha de locacao
                 if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
                     if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
+                        #uníco booleano para geração da planilha mais tarde 
                         planCalculated = True
 
                         expEst = QgsExpression("ID = '"+self.dlg.stationSelec.currentText()+"'")
