@@ -115,6 +115,7 @@ def euclidean_distance(point1,point2):
     return math.sqrt((point2.x()-point1.x())**2 + (point2.y()-point1.y())**2)
 
 def euclideanDistanceTuple3D(t1,t2):
+    #calcula a distancia entre 2 pontos 3D representados como tupla
     return math.sqrt((t1[0]-t2[0])**2+(t1[1]-t2[1])**2+(t1[2]-t2[2])**2)
 
 def euclideanDistanceTuple2D(t1,t2):
