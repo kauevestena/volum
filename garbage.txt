@@ -88,3 +88,9 @@ def det(l):
         return sum
     else:
         return (l[0][0]*l[1][1]-l[0][1]*l[1][0])
+
+
+
+computername = "kaue2"
+# # computername = "kauevestena"
+# #HITF = Handle In The Future

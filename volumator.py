@@ -52,6 +52,10 @@ import os.path
 
 # def regTetrahVol()
 
+#in order to obtain the path
+homedir = os.environ['HOME'] #need to be tested in windows enviroments
+
+
 toDeg = 180/math.pi
 toRad = math.pi/180
 
@@ -194,11 +198,6 @@ def define_op(MIN,MAX,hcal):
     # print op
     return op
 
-
-
-computername = "kaue2"
-# computername = "kauevestena"
-#HITF = Handle In The Future
 
 print "teste "+get_datetime() #COMMENT
 
@@ -537,8 +536,8 @@ class volum:
 
 
         # ####################### LINHAS A VIRAR COMENTARIO
-        self.dlg.input2.setText("/home/"+computername+"/Documents/epsg32614.csv") #COMMENT
-        self.dlg.outputTxt.setText("/home/"+computername+"/report.txt") #COMMENT
+        self.dlg.input2.setText(homedir+"/Documents/epsg32614.csv") #COMMENT
+        self.dlg.outputTxt.setText(homedir+"/report.txt") #COMMENT
 
 
 
@@ -769,16 +768,18 @@ class volum:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
 
-
+            
             ##################################################################################### CODIGO
 
             ###PATHS
-            delaupath = "/home/"+computername+"/.qgis2/processing/outputs/delau3.shp"  #HITF
-            xymeanpath  = "/home/"+computername+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
-            point2spath = "/home/"+computername+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
-            contourpath = "/home/"+computername+"/.qgis2/processing/outputs/contour2017.shp" #HITF
-            # contourpath2 = "/home/"+computername+"/.qgis2/processing/outputs/contour4.shp" #HITF
-            # outpath = "/home/"+computername+"/report.txt" #HITF
+
+            delaupath = homedir+"/.qgis2/processing/outputs/delau3.shp"  #HITF
+            # delaupath = "/../../../processing/outputs/delau.shp" #trying to use relative path rather than absolute, maybe in future
+            xymeanpath  = homedir+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
+            point2spath = homedir+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
+            contourpath = homedir+"/.qgis2/processing/outputs/contour2017.shp" #HITF
+            # contourpath2 = homedir+"/.qgis2/processing/outputs/contour4.shp" #HITF
+            # outpath = homedir+"/report.txt" #HITF
 
             deleteIfExists(delaupath) #CAREFUL
             # deleteIfExists(xymeanpath)
