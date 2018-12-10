@@ -33,7 +33,7 @@ Há um campo para seleção do CRS dos dados, com a opção do CRS ortografico, 
 
 O calculo é feito com base em uma altitude fornecida no campo de entrada disponível na janela do plugin
 
-Há um botao para obter os valores máximo e mínimo de Altitude (ou "cota"), uma vez que acima do primeiro se tera apenas volume de aterro e abaixo do minímo se tera apenas volume de corte.
+Há um botao para obter os valores máximo e mínimo de Altitude (ou "cota"), uma vez que acima do primeiro existirá apenas volume de aterro e abaixo do minímo existirá apenas volume de corte.
 
 Para qualquer altitude intermediária, será gerada a curva de nivel desta, havendo a possibilidade de gerar a planilha de locação de tal curva, no intervalo especificado. Caso o ID de um dos pontos contenha: "EST","est","Est", tal ponto será automaticamente selecionado como ponto para instalacao. O mesmo vale para "ORI","ori","Ori","RE","Re","re", que sera automaticamente selecionado como ponto para orientação.
  
