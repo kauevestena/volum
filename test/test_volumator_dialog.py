@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2017, Kaue de Moraes Vestena - UFPR'
 
 import unittest
 
-from PyQt4.QtGui import QDialogButtonBox, QDialog
+from qgis.PyQt.QtWidgets import QDialogButtonBox, QDialog
 
 from volumator_dialog import volumDialog
 
@@ -52,4 +52,3 @@ if __name__ == "__main__":
     suite = unittest.makeSuite(volumDialogTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-

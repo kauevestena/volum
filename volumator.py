@@ -21,24 +21,30 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, QLocale
-# import QString
-from PyQt4.QtGui import QAction, QIcon, QFileDialog, QColor
-from qgis.core import QgsVectorLayer, QgsMapLayerRegistry, QgsVectorFileWriter, QgsFeatureRequest, QgsPoint
-from qgis.core import QgsCoordinateReferenceSystem, QgsFeatureRequest, QgsVectorLayerEditUtils,QgsExpression
-from qgis.core import QgsField, QgsGeometry, QgsFeature, QgsColorRampShader, QgsSymbolV2, QgsRendererRangeV2
-from qgis.core import QgsGraduatedSymbolRendererV2
-# from qgis.core import *
-from qgis.gui import QgsMapCanvas, QgsProjectionSelectionWidget
-from qgis.utils import iface
+from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication, QVariant, QLocale
+from qgis.PyQt.QtWidgets import QAction, QFileDialog
+from qgis.PyQt.QtGui import QIcon, QColor
+from qgis.core import (
+    QgsVectorLayer,
+    QgsCoordinateReferenceSystem,
+    QgsFeatureRequest,
+    QgsExpression,
+    QgsField,
+    QgsGeometry,
+    QgsFeature,
+    QgsProject,
+    QgsPointXY,
+)
+from qgis.gui import QgsProjectionSelectionWidget
 # Initialize Qt resources from file resources.py
 import resources
 
 ############
-import processing
+from qgis import processing
 import time
 import math
 import os
+import tempfile
 ############
 
 # Import the code for the dialog
@@ -53,7 +59,7 @@ import os.path
 # def regTetrahVol()
 
 #in order to obtain the path
-homedir = os.environ['HOME'] #need to be tested in windows enviroments
+homedir = os.path.expanduser("~")  # compatible with different OSes
 
 
 toDeg = 180/math.pi
@@ -69,11 +75,6 @@ def gdec2gms(gdec):
         s = -s
     return (g,m,s)
 
-def deleteIfExists(path):
-    if os.path.isfile(path):
-        os.remove(path)
-
-
 crsOrt = QgsCoordinateReferenceSystem()
 crsOrt.createFromProj4("+proj=ortho +lat_0=0.0 +lon_0=0.0 +x_0=0 +y_0=0")
 
@@ -85,6 +86,10 @@ def azimuth2points(A,B):
         az+=360
     return az
 
+
+def geometry_from_points(points):
+    """Helper to build QGIS3 polylines from iterable of QgsPoint/QgsPointXY."""
+    return QgsGeometry.fromPolylineXY([QgsPointXY(pt) for pt in points])
 
 
 def dotProduct(p1,p2):
@@ -200,7 +205,7 @@ def define_op(MIN,MAX,hcal):
     return op
 
 
-print "teste "+get_datetime() #COMMENT
+print("teste {}".format(get_datetime()))  # COMMENT
 
 # class kPoint:
 #     def __init__(self,x,y,z):
@@ -316,8 +321,8 @@ class kTriangle:
                 v23 = sum2abs(vhs[1],vhs[2])
                 ditp12 = reg3(v12,dist12,abs(vhs[0]))
                 ditp23 = reg3(v23,dist23,abs(vhs[1]))
-                l12 = QgsGeometry.fromPolyline([self.poly[0][0],self.poly[0][1]])
-                l23 = QgsGeometry.fromPolyline([self.poly[0][1],self.poly[0][2]])
+                l12 = geometry_from_points([self.poly[0][0], self.poly[0][1]])
+                l23 = geometry_from_points([self.poly[0][1], self.poly[0][2]])
                 self.interPT1 = l12.interpolate(ditp12).asPoint()
                 self.interPT2 = l23.interpolate(ditp23).asPoint()
                 self.dp1 = ditp12
@@ -353,8 +358,8 @@ class kTriangle:
                 v31 = sum2abs(vhs[0],vhs[2])
                 ditp12 = reg3(v12,dist12,abs(vhs[0]))
                 ditp31 = reg3(v31,dist31,abs(vhs[2]))
-                l12 = QgsGeometry.fromPolyline([self.poly[0][0],self.poly[0][1]])
-                l31 = QgsGeometry.fromPolyline([self.poly[0][2],self.poly[0][0]])
+                l12 = geometry_from_points([self.poly[0][0], self.poly[0][1]])
+                l31 = geometry_from_points([self.poly[0][2], self.poly[0][0]])
                 self.interPT1 = l12.interpolate(ditp12).asPoint()
                 self.interPT2 = l31.interpolate(ditp31).asPoint()
                 self.dp1 = ditp12
@@ -394,8 +399,8 @@ class kTriangle:
                 v31 = sum2abs(vhs[0],vhs[2])
                 ditp23 = reg3(v23,dist23,abs(vhs[1]))
                 ditp31 = reg3(v31,dist31,abs(vhs[2]))
-                l23 = QgsGeometry.fromPolyline([self.poly[0][1],self.poly[0][2]])
-                l31 = QgsGeometry.fromPolyline([self.poly[0][2],self.poly[0][0]])
+                l23 = geometry_from_points([self.poly[0][1], self.poly[0][2]])
+                l31 = geometry_from_points([self.poly[0][2], self.poly[0][0]])
                 self.interPT1 = l23.interpolate(ditp23).asPoint()
                 self.interPT2 = l31.interpolate(ditp31).asPoint()
                 self.dp1 = ditp23
@@ -454,7 +459,11 @@ class volum:
         # initialize plugin directory
         self.plugin_dir = os.path.dirname(__file__)
         # initialize locale
-        locale = QSettings().value('locale/userLocale')[0:2]
+        locale = QSettings().value('locale/userLocale', 'en')
+        if locale:
+            locale = locale[0:2]
+        else:
+            locale = 'en'
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
@@ -662,19 +671,23 @@ class volum:
     ################################################################ FUNÇOES-MEMBRO 
 
     def select_input_file(self):
-        filename = QFileDialog.getOpenFileName(self.dlg, "Selecione o Arquivo de entrada ","", '*.csv')
-        self.dlg.input2.setText(filename)
+        filename, _ = QFileDialog.getOpenFileName(
+            self.dlg, "Selecione o Arquivo de entrada ", "", '*.csv')
+        if filename:
+            self.dlg.input2.setText(filename)
 
     def select_output_file(self):
-        filename = QFileDialog.getSaveFileName(self.dlg, "Selecione o Arquivo de saida ","", '*.txt')
-        self.dlg.outputTxt.setText(filename)
+        filename, _ = QFileDialog.getSaveFileName(
+            self.dlg, "Selecione o Arquivo de saida ", "", '*.txt')
+        if filename:
+            self.dlg.outputTxt.setText(filename)
 
 
-    def add_layer_canvas(self,layer):
-        # canvas = QgsMapCanvas()
-        QgsMapLayerRegistry.instance().addMapLayer(layer)
-        QgsMapCanvas().setExtent(layer.extent())
-        # canvas.setLayerSet([QgsMapCanvasLayer(layer)])
+    def add_layer_canvas(self, layer):
+        QgsProject.instance().addMapLayer(layer)
+        canvas = self.iface.mapCanvas()
+        canvas.setExtent(layer.extent())
+        canvas.refresh()
         
     def set_orto_crs(self):
         # if self.dlg.defProjButton.clicked:
@@ -772,54 +785,50 @@ class volum:
             
             ##################################################################################### CODIGO
 
-            ###PATHS
+            temp_dir = tempfile.mkdtemp(prefix="volumator_")
+            delaupath = os.path.join(temp_dir, "delaunay.shp")
+            contourpath = os.path.join(temp_dir, "contour.shp")
 
-            delaupath = homedir+"/.qgis2/processing/outputs/delau3.shp"  #HITF
-            # delaupath = "/../../../processing/outputs/delau.shp" #trying to use relative path rather than absolute, maybe in future
-            xymeanpath  = homedir+"/.qgis2/processing/outputs/XYmean2.shp" #HITF
-            point2spath = homedir+"/.qgis2/processing/outputs/datapoints3.shp" #HITF
-            contourpath = homedir+"/.qgis2/processing/outputs/contour2017.shp" #HITF
-            # contourpath2 = homedir+"/.qgis2/processing/outputs/contour4.shp" #HITF
-            # outpath = homedir+"/report.txt" #HITF
+            filename = self.dlg.input2.text().strip()
 
-            deleteIfExists(delaupath) #CAREFUL
-            # deleteIfExists(xymeanpath)
-            # deleteIfExists(point2spath)
-            deleteIfExists(contourpath)
-            
-            ###PATHS
+            if not filename:
+                self.iface.messageBar().pushWarning(
+                    "Volumator", "Selecione o arquivo de entrada antes de executar.")
+                return
 
-            self.dlg.botaoinput.clicked.connect
-
-            filename = self.dlg.input2.text()
-            
-            # print filename
-            
-            path2 = filename+"?delimiter=%s&xField=%s&yField=%s" % (",", "X", "Y")
+            path2 = "{}?delimiter={}&xField={}&yField={}".format(filename, ",", "X", "Y")
 
             datapoints = QgsVectorLayer(path2, "pontos", "delimitedtext")
 
+            if not datapoints.isValid():
+                self.iface.messageBar().pushCritical(
+                    "Volumator", "Não foi possível carregar o arquivo de entrada.")
+                return
 
-                
             datapoints.setCrs(self.dlg.crsSel.crs())
 
+            try:
+                processing.run(
+                    "qgis:delaunaytriangulation",
+                    {
+                        'INPUT': datapoints,
+                        'OUTPUT': delaupath
+                    }
+                )
+            except Exception as exc:
+                self.iface.messageBar().pushCritical(
+                    "Volumator", "Erro na geração da triangulação: {}".format(exc))
+                return
 
-            
+            triangles = QgsVectorLayer(delaupath, "triangles", "ogr")
 
-            processing.runalg("qgis:delaunaytriangulation",datapoints,delaupath)
-
-            triangles = QgsVectorLayer(delaupath,"triangles","ogr")
-
-            
-
-            processing.runalg("qgis:meancoordinates",datapoints,None,None,xymeanpath)
-
-            xymean = QgsVectorLayer(xymeanpath,"pmed","ogr")
-
+            if not triangles.isValid():
+                self.iface.messageBar().pushCritical(
+                    "Volumator", "Falha ao carregar a triangulação gerada.")
+                return
 
             ##passando todos para o CRS selecionado
             triangles.setCrs(self.dlg.crsSel.crs())
-            xymean.setCrs(self.dlg.crsSel.crs())
 
 
 
@@ -914,6 +923,7 @@ class volum:
             
             #geracao da polilinha da curva, quando aplicavel
             planCalculated = False
+            contour2 = None
             if op == 3:
                 # poly = []
                 # distList = []
@@ -930,7 +940,7 @@ class volum:
                         # f2 = QgsFeature()
                         f1.setAttributes([1])
                         # f2.setAttributes([triang.dp2])
-                        f1.setGeometry(QgsGeometry.fromPolyline([triang.interPT1,triang.interPT2]))
+                        f1.setGeometry(geometry_from_points([triang.interPT1, triang.interPT2]))
                         # f1.setGeometry(QgsGeometry.fromPoint(triang.interPT1))
                         # f2.setGeometry(QgsGeometry.fromPoint(triang.interPT2))
                         prov.addFeatures([f1])
@@ -951,32 +961,52 @@ class volum:
 
                 #Geracao da curva de nivel como uma geometria unica
                 #  nao os segmentos separadpos
-
-                processing.runalg("qgis:singlepartstomultipart",contour,"id",contourpath)
-                contour2 = QgsVectorLayer(contourpath,"CalcContour","ogr")
-                self.add_layer_canvas(contour)
-                feature = contour2.getFeatures().next()
-
-                #gerando os pontos a serem locados
-                interpolatedPoints = QgsVectorLayer("Point","pontosLocac","memory")
-                interpolatedPoints.setCrs(self.dlg.crsSel.crs())
-                prov2 = interpolatedPoints.dataProvider()
-
-                contourLen = feature.geometry().length()
-                accum = 0.0
-                incr = self.dlg.espac.value() #
                 points = []
-                while (accum < contourLen):
-                    point = feature.geometry().interpolate(accum)
-                    points.append(point.asPoint())
-                    P = QgsFeature()
-                    P.setGeometry(point)
-                    accum += incr
-                    prov2.addFeatures([P])
+                try:
+                    processing.run(
+                        "native:singlepartstomultipart",
+                        {
+                            'INPUT': contour,
+                            'FIELD': 'id',
+                            'OUTPUT': contourpath
+                        }
+                    )
+                    contour2 = QgsVectorLayer(contourpath, "CalcContour", "ogr")
+                    if contour2.isValid():
+                        contour2.setCrs(self.dlg.crsSel.crs())
+                except Exception as exc:
+                    contour2 = None
+                    self.iface.messageBar().pushWarning(
+                        "Volumator", "Falha ao unificar a curva: {}".format(exc))
 
-                interpolatedPoints.updateFields()
-                interpolatedPoints.updateExtents()
-                interpolatedPoints.commitChanges()
+                self.add_layer_canvas(contour)
+                feature = None
+                if contour2 is not None and contour2.isValid():
+                    feature = next(contour2.getFeatures(), None)
+
+                if feature is not None:
+                    #gerando os pontos a serem locados
+                    interpolatedPoints = QgsVectorLayer("Point", "pontosLocac", "memory")
+                    interpolatedPoints.setCrs(self.dlg.crsSel.crs())
+                    prov2 = interpolatedPoints.dataProvider()
+
+                    contourLen = feature.geometry().length()
+                    accum = 0.0
+                    incr = self.dlg.espac.value() #
+                    while (accum < contourLen):
+                        point = feature.geometry().interpolate(accum)
+                        points.append(point.asPoint())
+                        P = QgsFeature()
+                        P.setGeometry(point)
+                        accum += incr
+                        prov2.addFeatures([P])
+
+                    interpolatedPoints.updateFields()
+                    interpolatedPoints.updateExtents()
+                    interpolatedPoints.commitChanges()
+                else:
+                    self.iface.messageBar().pushWarning(
+                        "Volumator", "Não foi possível gerar a curva calculada.")
 
 
                 # line = QgsGeometry.fromPolyline(poly)
@@ -986,13 +1016,10 @@ class volum:
                 # prov.addFeatures([feat])
 
             
-                print "pass1" #COMMENT
+                print("pass1")  # COMMENT
                 #### Calculos e geração dos dados para a planilha de locacao
                 if self.dlg.calcLoc.isChecked() and self.dlg.stationSelec.count() != 0:
                     if  self.dlg.stationSelec.currentText() != self.dlg.oriSelec.currentText():
-                        #uníco booleano para geração da planilha mais tarde 
-                        planCalculated = True
-
                         expEst = QgsExpression("ID = '"+self.dlg.stationSelec.currentText()+"'")
                         expOri = QgsExpression("ID = '"+self.dlg.oriSelec.currentText()+"'")
 
@@ -1002,58 +1029,64 @@ class volum:
                         itEst = datapoints.getFeatures(reqEst)
                         itOri = datapoints.getFeatures(reqOri)
 
-                        featEst = itEst.next()
-                        featOri = itOri.next()
+                        featEst = next(itEst, None)
+                        featOri = next(itOri, None)
 
-                        pEst = featEst.geometry().asPoint()
-                        pOri = featOri.geometry().asPoint()
+                        if featEst is None or featOri is None:
+                            self.iface.messageBar().pushWarning(
+                                "Volumator", "IDs de estação ou orientação não encontrados.")
+                        else:
+                            #uníco booleano para geração da planilha mais tarde 
+                            planCalculated = True
+                            pEst = featEst.geometry().asPoint()
+                            pOri = featOri.geometry().asPoint()
 
-                        zEst = featEst[3] + self.dlg.hEquip.value()
-                        zOri = featOri[3] + self.dlg.hBast.value()
+                            zEst = featEst[3] + self.dlg.hEquip.value()
+                            zOri = featOri[3] + self.dlg.hBast.value()
 
-                        Est = (pEst[0],pEst[1],zEst)
-                        Ori = (pOri[0],pOri[1],zOri)
+                            Est = (pEst[0],pEst[1],zEst)
+                            Ori = (pOri[0],pOri[1],zOri)
 
-                        dhEO = euclideanDistanceTuple2D(Est,Ori)
-                        diEO = euclideanDistanceTuple3D(Est,Ori)
+                            dhEO = euclideanDistanceTuple2D(Est,Ori)
+                            diEO = euclideanDistanceTuple3D(Est,Ori)
 
-                        aZpart = azimuth2points(Est,Ori)
+                            aZpart = azimuth2points(Est,Ori)
 
-                        angZEO = gdec2gms(azimuth2points((0,0),(dhEO,Ori[2]-Est[2])))
+                            angZEO = gdec2gms(azimuth2points((0,0),(dhEO,Ori[2]-Est[2])))
 
-                        data=[]
+                            data=[]
 
-                        locLines = QgsVectorLayer("LineString","locLines","memory")
-                        locLines.setCrs(self.dlg.crsSel.crs())
-                        prov3 = locLines.dataProvider()
-                        prov3.addAttributes([QgsField("Tipo", QVariant.String)])
+                            locLines = QgsVectorLayer("LineString","locLines","memory")
+                            locLines.setCrs(self.dlg.crsSel.crs())
+                            prov3 = locLines.dataProvider()
+                            prov3.addAttributes([QgsField("Tipo", QVariant.String)])
 
-                        f1 = QgsFeature()
-                        f1.setAttributes(["Referencia"])
-                        f1.setGeometry(QgsGeometry.fromPolyline([pEst,pOri]))
-                        prov3.addFeatures([f1])
-
-
-                        for ppoint in points:
-                            P3D = (ppoint[0],ppoint[1],hcal)
-                            DI = euclideanDistanceTuple3D(Est,P3D)
-                            DH = euclideanDistanceTuple3D(Est,P3D)
-                            AzVante = azimuth2points(Est,P3D)
-                            angHdec = angleFromAz(aZpart,AzVante)
-                            vZ = P3D[2] - Est[2]
-                            angZdec = azimuth2points((0,0),(DH,vZ))
-                            angH = gdec2gms(angHdec)
-                            angZ =  gdec2gms(angZdec)
-                            pointData = [angH,angZ,DI,DH]
-                            data.append(pointData)
                             f1 = QgsFeature()
-                            f1.setAttributes(["Ponto Na Curva"])
-                            f1.setGeometry(QgsGeometry.fromPolyline([pEst,ppoint]))
-                            prov3.addFeatures([f1])                            
+                            f1.setAttributes(["Referencia"])
+                            f1.setGeometry(geometry_from_points([pEst, pOri]))
+                            prov3.addFeatures([f1])
 
-                        locLines.updateFields()
-                        locLines.updateExtents()
-                        locLines.commitChanges()
+
+                            for ppoint in points:
+                                P3D = (ppoint[0],ppoint[1],hcal)
+                                DI = euclideanDistanceTuple3D(Est,P3D)
+                                DH = euclideanDistanceTuple3D(Est,P3D)
+                                AzVante = azimuth2points(Est,P3D)
+                                angHdec = angleFromAz(aZpart,AzVante)
+                                vZ = P3D[2] - Est[2]
+                                angZdec = azimuth2points((0,0),(DH,vZ))
+                                angH = gdec2gms(angHdec)
+                                angZ =  gdec2gms(angZdec)
+                                pointData = [angH,angZ,DI,DH]
+                                data.append(pointData)
+                                f1 = QgsFeature()
+                                f1.setAttributes(["Ponto Na Curva"])
+                                f1.setGeometry(geometry_from_points([pEst, ppoint]))
+                                prov3.addFeatures([f1])                            
+
+                            locLines.updateFields()
+                            locLines.updateExtents()
+                            locLines.commitChanges()
                     
 
 
@@ -1133,7 +1166,7 @@ class volum:
 
 
             ### projeto com o CRS escolhido
-            iface.mapCanvas().mapRenderer().setDestinationCrs(self.dlg.crsSel.crs())
+            self.iface.mapCanvas().mapSettings().setDestinationCrs(self.dlg.crsSel.crs())
 
 
             #Modificando Estilos
@@ -1161,11 +1194,11 @@ class volum:
             #### adicionando na visualização
             self.add_layer_canvas(triangles)
             self.add_layer_canvas(datapoints)
-            if op == 3:
+            if op == 3 and contour2 is not None and contour2.isValid():
                 self.add_layer_canvas(contour2)
-                
-                if planCalculated:
-                    self.add_layer_canvas(locLines)
+
+            if op == 3 and planCalculated:
+                self.add_layer_canvas(locLines)
                     # pass #layer com linhas de locacao
                 # self.add_layer_canvas(interpolatedPoints)
                 # self.add_layer_canvas(contour)
@@ -1176,5 +1209,5 @@ class volum:
             # pass
 
             # print self.dlg.both.isChecked()
-            print "end" #COMMENT
+            print("end")  # COMMENT
             

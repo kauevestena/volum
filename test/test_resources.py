@@ -14,7 +14,7 @@ __copyright__ = 'Copyright 2017, Kaue de Moraes Vestena - UFPR'
 
 import unittest
 
-from PyQt4.QtGui import QIcon
+from qgis.PyQt.QtGui import QIcon
 
 
 
@@ -39,6 +39,5 @@ if __name__ == "__main__":
     suite = unittest.makeSuite(volumResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
 
 
